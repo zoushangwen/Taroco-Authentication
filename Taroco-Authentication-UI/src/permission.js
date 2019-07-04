@@ -18,11 +18,11 @@ router.beforeEach((to, from, next) => {
     NProgress.done()
   } else {
     store.dispatch('GetInfo').then(res => {
-      console.log(res)
+      next()
+    }).catch(() => {
+      next({ path: '/user/login' })
     })
   }
-  // const redirect = decodeURIComponent(from.query.redirect || to.path)
-  next()
 })
 
 router.afterEach(() => {

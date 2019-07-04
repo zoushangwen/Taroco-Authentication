@@ -1,7 +1,6 @@
 package cn.taroco.oauth2.authentication.controller;
 
 import cn.taroco.oauth2.authentication.common.Response;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -30,16 +29,5 @@ public class UserController {
             return null;
         }
         return ResponseEntity.ok(Response.success(authentication.getPrincipal()));
-    }
-
-    /**
-     * Session 失效异步返回
-     *
-     * @return
-     */
-    @RequestMapping("/sessionInvalid")
-    @ResponseBody
-    public ResponseEntity<Response> sessionInvalid() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Response.failure("登录已失效,请重新登录"));
     }
 }

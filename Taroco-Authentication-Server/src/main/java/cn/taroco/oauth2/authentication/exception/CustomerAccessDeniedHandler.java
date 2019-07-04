@@ -27,8 +27,7 @@ public class CustomerAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(final HttpServletRequest request, final HttpServletResponse response, final AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        final Response resp = Response.failure("0015", "没有访问权限");
-        resp.setErrorMessage(accessDeniedException.getMessage());
+        final Response resp = Response.failure(accessDeniedException.getMessage());
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         response.getWriter().write(objectMapper.writeValueAsString(resp));

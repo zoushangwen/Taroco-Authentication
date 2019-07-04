@@ -54,7 +54,7 @@ public class CustomerAuthenticationFilter extends OncePerRequestFilter {
 
         if (clientDetails == null) {
             log.warn("No clients or clients is invalid in request header");
-            final Response resp = Response.failure("0013", "客户端异常");
+            final Response resp = Response.failure("客户端异常");
             resp.setErrorMessage("No clients or clients is invalid in request header");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
@@ -80,7 +80,7 @@ public class CustomerAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (NoSuchClientException e) {
             log.warn("No client with requested id:" + clientDetails[0]);
-            final Response resp = Response.failure("0013", "客户端异常");
+            final Response resp = Response.failure("客户端异常");
             resp.setErrorMessage("No client with requested id:" + clientDetails[0]);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);

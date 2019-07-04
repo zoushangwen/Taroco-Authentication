@@ -27,8 +27,7 @@ public class CustomerExceptionEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(final HttpServletRequest request, final HttpServletResponse response, final AuthenticationException authException) throws IOException, ServletException {
-        final Response resp = Response.failure("0006", "认证失败");
-        resp.setErrorMessage(authException.getMessage());
+        final Response resp = Response.failure(authException.getMessage());
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         response.getWriter().write(objectMapper.writeValueAsString(resp));

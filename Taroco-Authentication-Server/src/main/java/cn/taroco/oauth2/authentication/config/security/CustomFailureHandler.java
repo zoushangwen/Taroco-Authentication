@@ -29,8 +29,7 @@ public class CustomFailureHandler implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(final HttpServletRequest request,
                                         final HttpServletResponse response,
                                         final AuthenticationException exception) throws IOException, ServletException {
-        final Response resp = Response.failure("0006", "登录失败");
-        resp.setErrorMessage(exception.getMessage());
+        final Response resp = Response.failure(exception.getMessage());
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         response.getWriter().write(objectMapper.writeValueAsString(resp));
