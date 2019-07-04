@@ -3,7 +3,6 @@ package cn.taroco.oauth2.authentication.controller;
 import cn.taroco.oauth2.authentication.common.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,21 +29,6 @@ public class AuthenticationController {
     @GetMapping("/require")
     public String require() {
         return "index";
-    }
-
-    /**
-     * 用户信息校验
-     *
-     * @param authentication 信息
-     * @return 用户信息
-     */
-    @RequestMapping("/user")
-    @ResponseBody
-    public ResponseEntity<Response> user(Authentication authentication) {
-        if (authentication == null) {
-            return null;
-        }
-        return ResponseEntity.ok(Response.success(authentication.getPrincipal()));
     }
 
     /**

@@ -19,11 +19,6 @@ public interface CacheConstants {
     String PREFIX = "taroco" + SPLIT;
 
     /**
-     * 路由信息Redis保存的key
-     */
-    String ROUTE_KEY = PREFIX + "routes";
-
-    /**
      * 验证码缓存key
      */
     String DEFAULT_CODE_KEY = PREFIX + "code" + SPLIT;

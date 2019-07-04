@@ -5,6 +5,8 @@ import cn.taroco.oauth2.authentication.common.TarocoRedisRepository;
 import cn.taroco.oauth2.authentication.config.security.CustomAuthenticationFilter;
 import cn.taroco.oauth2.authentication.config.security.CustomFailureHandler;
 import cn.taroco.oauth2.authentication.config.security.CustomSuccessHandler;
+import cn.taroco.oauth2.authentication.config.security.UsernamePasswordAuthenticationEntryPoint;
+import cn.taroco.oauth2.authentication.exception.CustomerAccessDeniedHandler;
 import cn.taroco.oauth2.authentication.filter.MobileAuthenticationFilter;
 import cn.taroco.oauth2.authentication.handler.MobileLoginFailureHandler;
 import cn.taroco.oauth2.authentication.handler.MobileLoginSuccessHandler;
@@ -60,6 +62,12 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomFailureHandler failureHandler;
 
+    @Autowired
+    private CustomerAccessDeniedHandler accessDeniedHandler;
+
+    @Autowired
+    private UsernamePasswordAuthenticationEntryPoint usernamePasswordAuthenticationEntryPoint;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry =
@@ -69,6 +77,9 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
                         .formLogin().loginPage("/").permitAll()
                         .loginProcessingUrl("/login").permitAll()
                         .and().logout().logoutUrl("/logout").permitAll()
+                        .and().exceptionHandling()
+                        .authenticationEntryPoint(usernamePasswordAuthenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
                         .and().authorizeRequests();
 
         final List<String> urlPermitAll = oauth2Properties.getUrlPermitAll();

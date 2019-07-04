@@ -38,6 +38,7 @@ taroco:
       - /
       - /actuator/**
       - /authentication/**
+      - /sessionInvalid
       - /oauth/mobile
       - /webjars/**
       - /static/**

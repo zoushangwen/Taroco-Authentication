@@ -63,26 +63,6 @@ public interface SecurityConstants {
     String HEADER_LABEL = "x-label";
 
     /**
-     * 标签 header 分隔符
-     */
-    String HEADER_LABEL_SPLIT = ",";
-
-    /**
-     * 标签或 名称
-     */
-    String LABEL_OR = "labelOr";
-
-    /**
-     * 标签且 名称
-     */
-    String LABEL_AND = "labelAnd";
-
-    /**
-     * 权重key
-     */
-    String WEIGHT_KEY = "weight";
-
-    /**
      * license key
      */
     String LICENSE_KEY = "license";
@@ -116,51 +96,6 @@ public interface SecurityConstants {
      * 手机号登录路径
      */
     String MOBILE_TOKEN_URL = "/oauth/mobile";
-
-    /**
-     * 默认的处理验证码的url前缀
-     */
-    String DEFAULT_VALIDATE_CODE_URL_PREFIX = "/code";
-
-    /**
-     * 默认生成图形验证码宽度
-     */
-    String DEFAULT_IMAGE_WIDTH = "100";
-
-    /**
-     * 默认生成图像验证码高度
-     */
-    String DEFAULT_IMAGE_HEIGHT = "40";
-
-    /**
-     * 默认生成图形验证码长度
-     */
-    String DEFAULT_IMAGE_LENGTH = "4";
-
-    /**
-     * 默认生成图形验证码过期时间
-     */
-    int DEFAULT_IMAGE_EXPIRE = 60;
-
-    /**
-     * 边框颜色，合法值： r,g,b (and optional alpha) 或者 white,black,blue.
-     */
-    String DEFAULT_COLOR_FONT = "blue";
-
-    /**
-     * 图片边框
-     */
-    String DEFAULT_IMAGE_BORDER = "no";
-
-    /**
-     * 默认图片间隔
-     */
-    String DEFAULT_CHAR_SPACE = "5";
-
-    /**
-     * 验证码文字大小
-     */
-    String DEFAULT_IMAGE_FONT_SIZE = "30";
 
     /**
      * sys_oauth_client_details 表的字段，不包括client_id、client_secret
