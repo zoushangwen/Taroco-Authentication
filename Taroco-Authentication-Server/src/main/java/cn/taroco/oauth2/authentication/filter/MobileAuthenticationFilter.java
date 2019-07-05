@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 手机号登录Filter
+ * 手机号登录认证filter
  *
  * @author liuht
  * 2019/5/13 15:37

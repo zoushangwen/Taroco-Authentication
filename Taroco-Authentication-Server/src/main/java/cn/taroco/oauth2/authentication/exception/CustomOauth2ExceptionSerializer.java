@@ -8,19 +8,21 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
 
 /**
- * CustomerOAuth2Exception 序列化实现
+ * CustomOauth2Exception 序列化实现
  *
  * @author liuht
  * 2019/5/6 10:29
  */
-public class CustomerOAuth2ExceptionSerializer extends StdSerializer<CustomerOAuth2Exception> {
+public class CustomOauth2ExceptionSerializer extends StdSerializer<CustomOauth2Exception> {
 
-    public CustomerOAuth2ExceptionSerializer() {
-        super(CustomerOAuth2Exception.class);
+    private static final long serialVersionUID = -782578501088784448L;
+
+    public CustomOauth2ExceptionSerializer() {
+        super(CustomOauth2Exception.class);
     }
 
     @Override
-    public void serialize(final CustomerOAuth2Exception e, final JsonGenerator jsonGenerator, final SerializerProvider serializerProvider) throws IOException {
+    public void serialize(final CustomOauth2Exception e, final JsonGenerator jsonGenerator, final SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField("errorCode", "0006");
         jsonGenerator.writeStringField("errorMessage", e.getOAuth2ErrorCode() + ":" + e.getMessage());

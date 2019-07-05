@@ -1,5 +1,6 @@
-package cn.taroco.oauth2.authentication.config.security;
+package cn.taroco.oauth2.authentication.filter;
 
+import cn.taroco.oauth2.authentication.core.AuthenticationBean;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -14,13 +15,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * 重写 UsernamePasswordAuthenticationFilter 类, 实现异步JSON登录
+ * 重写 UsernamePasswordAuthenticationFilter 类, 支持实现异步JSON登录
  *
  * @author liuht
  * 2019/7/3 14:09
  */
 @Slf4j
-public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class CustomUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {

@@ -26,6 +26,7 @@ import java.util.Base64;
 /**
  * 自定义AuthenticationFilter
  * 当我们的客户端信息不正确时服务端不会发送错误json信息而是让你重新登录，在一些app中是不能使用网页的，所以我们定义一个自己filter来处理客户端认证逻辑
+ * PS: 针对/oauth/token password 模式
  *
  * @author liuht
  * 2019/5/6 13:51
@@ -33,7 +34,7 @@ import java.util.Base64;
  */
 @Component
 @Slf4j
-public class CustomerAuthenticationFilter extends OncePerRequestFilter {
+public class CustomTokenPasswordAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private ClientDetailsService clientDetailsService;
@@ -54,8 +55,7 @@ public class CustomerAuthenticationFilter extends OncePerRequestFilter {
 
         if (clientDetails == null) {
             log.warn("No clients or clients is invalid in request header");
-            final Response resp = Response.failure("客户端异常");
-            resp.setErrorMessage("No clients or clients is invalid in request header");
+            final Response resp = Response.failure("No clients or clients is invalid in request header");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
             response.getWriter().write(objectMapper.writeValueAsString(resp));
@@ -80,8 +80,7 @@ public class CustomerAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (NoSuchClientException e) {
             log.warn("No client with requested id:" + clientDetails[0]);
-            final Response resp = Response.failure("客户端异常");
-            resp.setErrorMessage("No client with requested id:" + clientDetails[0]);
+            final Response resp = Response.failure("No client with requested id:" + clientDetails[0]);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
             response.getWriter().write(objectMapper.writeValueAsString(resp));
@@ -90,6 +89,7 @@ public class CustomerAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * 判断请求头中是否包含client信息，不包含返回null
+     *
      * @param request
      * @return
      */

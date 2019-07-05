@@ -3,11 +3,12 @@ package cn.taroco.oauth2.authentication.config;
 import cn.taroco.oauth2.authentication.common.SecurityConstants;
 import cn.taroco.oauth2.authentication.common.TarocoOauth2Properties;
 import cn.taroco.oauth2.authentication.common.UserVo;
-import cn.taroco.oauth2.authentication.exception.CustomerAccessDeniedHandler;
-import cn.taroco.oauth2.authentication.exception.CustomerExceptionEntryPoint;
-import cn.taroco.oauth2.authentication.exception.CustomerWebResponseExceptionTranslator;
-import cn.taroco.oauth2.authentication.filter.CustomerAuthenticationFilter;
+import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
+import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
+import cn.taroco.oauth2.authentication.exception.CustomWebResponseExceptionTranslator;
+import cn.taroco.oauth2.authentication.filter.CustomTokenPasswordAuthenticationFilter;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
+import cn.taroco.oauth2.authentication.token.CustomerAccessTokenConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,16 +57,16 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
     private UserNameUserDetailsServiceImpl userNameUserDetailsService;
 
     @Autowired
-    private CustomerWebResponseExceptionTranslator exceptionTranslator;
+    private CustomWebResponseExceptionTranslator exceptionTranslator;
 
     @Autowired
-    private CustomerExceptionEntryPoint exceptionEntryPoint;
+    private CustomExceptionEntryPoint exceptionEntryPoint;
 
     @Autowired
-    private CustomerAccessDeniedHandler accessDeniedHandler;
+    private CustomAccessDeniedHandler accessDeniedHandler;
 
     @Autowired
-    private CustomerAuthenticationFilter customerAuthenticationFilter;
+    private CustomTokenPasswordAuthenticationFilter customTokenPasswordAuthenticationFilter;
 
     @Autowired
     private DataSource dataSource;
@@ -174,6 +175,6 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
                 .allowFormAuthenticationForClients()
                 .authenticationEntryPoint(exceptionEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler)
-                .addTokenEndpointAuthenticationFilter(customerAuthenticationFilter);
+                .addTokenEndpointAuthenticationFilter(customTokenPasswordAuthenticationFilter);
     }
 }

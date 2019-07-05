@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.config.security;
+package cn.taroco.oauth2.authentication.handler;
 
 import cn.taroco.oauth2.authentication.common.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,13 +16,13 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * 自定义登录成功返回
+ * 用户名密码登录成功返回
  *
  * @author liuht
  * 2019/7/3 14:30
  */
 @Component
-public class CustomSuccessHandler implements AuthenticationSuccessHandler {
+public class UsernamePasswordAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     @Autowired
     private ObjectMapper objectMapper;

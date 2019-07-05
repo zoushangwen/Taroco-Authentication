@@ -2,14 +2,14 @@ package cn.taroco.oauth2.authentication.config;
 
 import cn.taroco.oauth2.authentication.common.TarocoOauth2Properties;
 import cn.taroco.oauth2.authentication.common.TarocoRedisRepository;
-import cn.taroco.oauth2.authentication.config.security.CustomAuthenticationFilter;
-import cn.taroco.oauth2.authentication.config.security.CustomFailureHandler;
-import cn.taroco.oauth2.authentication.config.security.CustomSuccessHandler;
-import cn.taroco.oauth2.authentication.config.security.UsernamePasswordAuthenticationEntryPoint;
-import cn.taroco.oauth2.authentication.exception.CustomerAccessDeniedHandler;
+import cn.taroco.oauth2.authentication.filter.CustomUsernamePasswordAuthenticationFilter;
 import cn.taroco.oauth2.authentication.filter.MobileAuthenticationFilter;
+import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
+import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
 import cn.taroco.oauth2.authentication.handler.MobileLoginFailureHandler;
 import cn.taroco.oauth2.authentication.handler.MobileLoginSuccessHandler;
+import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationFailureHandler;
+import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationSuccessHandler;
 import cn.taroco.oauth2.authentication.provider.MobileAuthenticationProvider;
 import cn.taroco.oauth2.authentication.service.MobileUserDetailsService;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
@@ -57,16 +57,16 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     private MobileLoginSuccessHandler mobileLoginSuccessHandler;
 
     @Autowired
-    private CustomSuccessHandler successHandler;
+    private UsernamePasswordAuthenticationSuccessHandler successHandler;
 
     @Autowired
-    private CustomFailureHandler failureHandler;
+    private UsernamePasswordAuthenticationFailureHandler failureHandler;
 
     @Autowired
-    private CustomerAccessDeniedHandler accessDeniedHandler;
+    private CustomAccessDeniedHandler accessDeniedHandler;
 
     @Autowired
-    private UsernamePasswordAuthenticationEntryPoint usernamePasswordAuthenticationEntryPoint;
+    private CustomExceptionEntryPoint exceptionEntryPoint;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -78,7 +78,7 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
                         .loginProcessingUrl("/login").permitAll()
                         .and().logout().logoutUrl("/logout").permitAll()
                         .and().exceptionHandling()
-                        .authenticationEntryPoint(usernamePasswordAuthenticationEntryPoint)
+                        .authenticationEntryPoint(exceptionEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
                         .and().authorizeRequests();
 
@@ -124,8 +124,8 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
      * @throws Exception
      */
     @Bean
-    public CustomAuthenticationFilter customAuthenticationFilter() throws Exception {
-        CustomAuthenticationFilter filter = new CustomAuthenticationFilter();
+    public CustomUsernamePasswordAuthenticationFilter customAuthenticationFilter() throws Exception {
+        CustomUsernamePasswordAuthenticationFilter filter = new CustomUsernamePasswordAuthenticationFilter();
         filter.setAuthenticationSuccessHandler(successHandler);
         filter.setAuthenticationFailureHandler(failureHandler);
         //这句很关键，重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager

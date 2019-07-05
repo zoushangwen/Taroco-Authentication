@@ -23,7 +23,7 @@ import java.io.IOException;
  * 2019/5/6 10:45
  */
 @Component
-public class CustomerWebResponseExceptionTranslator implements WebResponseExceptionTranslator {
+public class CustomWebResponseExceptionTranslator implements WebResponseExceptionTranslator {
 
     private ThrowableAnalyzer throwableAnalyzer = new DefaultThrowableAnalyzer();
 
@@ -67,7 +67,7 @@ public class CustomerWebResponseExceptionTranslator implements WebResponseExcept
             headers.set("WWW-Authenticate", String.format("%s %s", OAuth2AccessToken.BEARER_TYPE, e.getSummary()));
         }
 
-        final CustomerOAuth2Exception exception = new CustomerOAuth2Exception(e.getMessage(), e);
+        final CustomOauth2Exception exception = new CustomOauth2Exception(e.getMessage(), e);
         return new ResponseEntity<>(exception, headers,
                 HttpStatus.valueOf(status));
 

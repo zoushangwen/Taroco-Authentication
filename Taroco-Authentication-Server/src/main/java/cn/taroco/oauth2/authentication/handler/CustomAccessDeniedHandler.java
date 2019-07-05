@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.exception;
+package cn.taroco.oauth2.authentication.handler;
 
 import cn.taroco.oauth2.authentication.common.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,13 +14,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 自定义授权失败返回信息
+ * 自定义授权失败返回信息: 通用
  *
  * @author liuht
  * 2019/5/6 11:02
  */
 @Component
-public class CustomerAccessDeniedHandler implements AccessDeniedHandler {
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Autowired
     private ObjectMapper objectMapper;
