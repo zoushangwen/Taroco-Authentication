@@ -15,13 +15,21 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/user/login') {
     // 登录界面直接放行
     next()
-    NProgress.done()
   } else {
-    store.dispatch('GetInfo').then(res => {
+    if (store.getters.nickname) {
       next()
-    }).catch(() => {
-      next({ path: '/user/login' })
-    })
+    } else {
+      store.dispatch('GetInfo').then(res => {
+        store.dispatch('GenerateRoutes', {}).then(() => {
+          router.addRoutes(store.getters.addRouters)
+          // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
+          next({ ...to, replace: true })
+        })
+      }).catch(() => {
+        next({ path: '/user/login' })
+        NProgress.done()
+      })
+    }
   }
 })
 

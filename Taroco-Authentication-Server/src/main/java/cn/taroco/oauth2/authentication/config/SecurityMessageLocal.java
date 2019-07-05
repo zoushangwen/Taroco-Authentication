@@ -17,7 +17,7 @@ public class SecurityMessageLocal {
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.addBasenames("classpath:messages/security/messages_zh_CN");
+        messageSource.addBasenames("classpath:org/springframework/security/messages_zh_CN");
         return messageSource;
     }
 }

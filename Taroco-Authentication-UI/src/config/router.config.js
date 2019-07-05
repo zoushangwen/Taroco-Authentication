@@ -1,7 +1,39 @@
 // eslint-disable-next-line
-import { UserLayout, BasicLayout, RouteView, BlankLayout, PageView, TarocoLayout } from '@/layouts'
+import { UserLayout, BasicLayout, RouteView, BlankLayout, PageView } from '@/layouts'
 
-export const asyncRouterMap = []
+export const asyncRouterMap = [
+  {
+    path: '/',
+    name: 'index',
+    component: BasicLayout,
+    meta: { title: '首页' },
+    redirect: '/home',
+    children: [
+      // home
+      {
+        path: '/home',
+        name: 'home',
+        component: () => import('@/views/taroco/home/Index'),
+        meta: { title: '首页', icon: 'home' }
+      },
+      // clients
+      {
+        path: '/clients',
+        redirect: '/clients/index',
+        component: PageView,
+        meta: { title: '客户端', icon: 'desktop' },
+        children: [
+          {
+            path: '/clients/index',
+            name: 'clients',
+            component: () => import('@/views/taroco/clients/Index'),
+            meta: { title: '客户端管理', icon: 'ie' }
+          }
+        ]
+      }
+    ]
+  }
+]
 
 /**
  * 基础路由
@@ -21,55 +53,36 @@ export const constantRouterMap = [
       }
     ]
   },
+  // Exception
   {
-    path: '/404',
-    component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
-  },
-  {
-    path: '/',
-    name: 'index',
-    component: TarocoLayout,
-    meta: { title: '首页' },
-    redirect: '/home',
+    path: '/exception',
+    name: 'exception',
+    component: RouteView,
+    redirect: '/exception/403',
+    meta: { title: '异常页', icon: 'warning' },
     children: [
-      // home
       {
-        path: '/home',
-        name: 'home',
-        component: () => import('@/views/taroco/home/Index'),
-        meta: { title: '首页' }
+        path: '/exception/403',
+        name: 'Exception403',
+        component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/403'),
+        meta: { title: '403' }
       },
-      // Exception
       {
-        path: '/exception',
-        name: 'exception',
-        component: RouteView,
-        redirect: '/exception/403',
-        meta: { title: '异常页', icon: 'warning' },
-        children: [
-          {
-            path: '/exception/403',
-            name: 'Exception403',
-            component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/403'),
-            meta: { title: '403' }
-          },
-          {
-            path: '/exception/404',
-            name: 'Exception404',
-            component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
-            meta: { title: '404' }
-          },
-          {
-            path: '/exception/500',
-            name: 'Exception500',
-            component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/500'),
-            meta: { title: '500' }
-          }
-        ]
+        path: '/exception/404',
+        name: 'Exception404',
+        component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
+        meta: { title: '404' }
+      },
+      {
+        path: '/exception/500',
+        name: 'Exception500',
+        component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/500'),
+        meta: { title: '500' }
       }
     ]
   },
   {
-    path: '*', redirect: '/404', hidden: true
+    path: '/404',
+    component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
   }
 ]

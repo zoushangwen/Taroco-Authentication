@@ -8,7 +8,7 @@ const user = {
     token: '',
     name: '',
     welcome: '',
-    avatar: '',
+    avatar: '/avatar2.jpg',
     roles: [],
     info: {}
   },
@@ -63,15 +63,15 @@ const user = {
 
     // 登出
     Logout ({ commit, state }) {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
         Vue.ls.remove(ACCESS_TOKEN)
 
         logout().then(() => {
           resolve()
-        }).catch(() => {
-          resolve()
+        }).catch(error => {
+          reject(error)
         })
       })
     }

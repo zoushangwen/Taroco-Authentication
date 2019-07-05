@@ -1,22 +1,11 @@
 <template>
   <div class="footer">
-    <div class="links">
-      <a
-        href="https://pro.loacg.com/"
-        target="_blank"
-      >Pro 首页</a>
-      <a
-        href="https://github.com/sendya/ant-design-pro-vue"
-        target="_blank"
-      >
-        <a-icon type="github" />
-      </a>
-      <a href="https://ant.design/">Ant Design</a>
-      <a href="https://vue.ant.design/">Vue Antd</a>
-    </div>
     <div class="copyright">
       Copyright
-      <a-icon type="copyright" /> 2018 <span>白鹭学园技术组出品</span>
+      <a-icon type="copyright" /> 2018 
+      <a-icon type="github" /> 
+      <a href="https://github.com/liuht777/Taroco-Authentication"> Taroco Authentication </a> 
+      <span>统一认证</span>
     </div>
   </div>
 </template>
@@ -36,7 +25,7 @@ export default {
   margin: 48px 0 24px;
   text-align: center;
 
-  .links {
+  .copyright {
     margin-bottom: 8px;
 
     a {
@@ -44,10 +33,6 @@ export default {
 
       &:hover {
         color: rgba(0, 0, 0, 0.65);
-      }
-
-      &:not(:last-child) {
-        margin-right: 40px;
       }
     }
   }
