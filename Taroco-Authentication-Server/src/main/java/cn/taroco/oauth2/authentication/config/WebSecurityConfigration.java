@@ -1,7 +1,5 @@
 package cn.taroco.oauth2.authentication.config;
 
-import cn.taroco.oauth2.authentication.common.TarocoOauth2Properties;
-import cn.taroco.oauth2.authentication.common.TarocoRedisRepository;
 import cn.taroco.oauth2.authentication.filter.CustomUsernamePasswordAuthenticationFilter;
 import cn.taroco.oauth2.authentication.filter.MobileAuthenticationFilter;
 import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
@@ -10,7 +8,9 @@ import cn.taroco.oauth2.authentication.handler.MobileLoginFailureHandler;
 import cn.taroco.oauth2.authentication.handler.MobileLoginSuccessHandler;
 import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationFailureHandler;
 import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationSuccessHandler;
+import cn.taroco.oauth2.authentication.handler.UsernamePasswordLogoutSuccessHandler;
 import cn.taroco.oauth2.authentication.provider.MobileAuthenticationProvider;
+import cn.taroco.oauth2.authentication.redis.TarocoRedisRepository;
 import cn.taroco.oauth2.authentication.service.MobileUserDetailsService;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +68,9 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomExceptionEntryPoint exceptionEntryPoint;
 
+    @Autowired
+    private UsernamePasswordLogoutSuccessHandler logoutSuccessHandler;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry =
@@ -76,7 +79,7 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
                         .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                         .formLogin().loginPage("/").permitAll()
                         .loginProcessingUrl("/login").permitAll()
-                        .and().logout().logoutUrl("/logout").permitAll()
+                        .and().logout().logoutUrl("/logout").permitAll().logoutSuccessHandler(logoutSuccessHandler)
                         .and().exceptionHandling()
                         .authenticationEntryPoint(exceptionEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)

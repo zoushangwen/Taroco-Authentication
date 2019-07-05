@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.common;
+package cn.taroco.oauth2.authentication.vo;
 
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;

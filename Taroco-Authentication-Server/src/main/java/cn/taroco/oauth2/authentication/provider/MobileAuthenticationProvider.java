@@ -1,8 +1,8 @@
 package cn.taroco.oauth2.authentication.provider;
 
 import cn.hutool.core.util.StrUtil;
-import cn.taroco.oauth2.authentication.common.CacheConstants;
-import cn.taroco.oauth2.authentication.common.TarocoRedisRepository;
+import cn.taroco.oauth2.authentication.consts.CacheConstants;
+import cn.taroco.oauth2.authentication.redis.TarocoRedisRepository;
 import cn.taroco.oauth2.authentication.token.MobileAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;

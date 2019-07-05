@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.common;
+package cn.taroco.oauth2.authentication.consts;
 
 /**
  * Security 权限常量

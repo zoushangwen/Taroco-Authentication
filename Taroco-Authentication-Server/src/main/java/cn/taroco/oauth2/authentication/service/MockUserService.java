@@ -1,6 +1,7 @@
-package cn.taroco.oauth2.authentication.common;
+package cn.taroco.oauth2.authentication.service;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.taroco.oauth2.authentication.vo.UserVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
  * 2019/7/3 9:52
  */
 @Service
-public class UserService {
+public class MockUserService {
 
     @Autowired
     private PasswordEncoder encoder;

@@ -1,8 +1,7 @@
 package cn.taroco.oauth2.authentication.config;
 
-import cn.taroco.oauth2.authentication.common.SecurityConstants;
-import cn.taroco.oauth2.authentication.common.TarocoOauth2Properties;
-import cn.taroco.oauth2.authentication.common.UserVo;
+import cn.taroco.oauth2.authentication.consts.SecurityConstants;
+import cn.taroco.oauth2.authentication.vo.UserVo;
 import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
 import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
 import cn.taroco.oauth2.authentication.exception.CustomWebResponseExceptionTranslator;

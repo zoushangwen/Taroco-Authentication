@@ -2,7 +2,7 @@ package cn.taroco.oauth2.authentication.handler;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.map.MapUtil;
-import cn.taroco.oauth2.authentication.common.SecurityConstants;
+import cn.taroco.oauth2.authentication.consts.SecurityConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

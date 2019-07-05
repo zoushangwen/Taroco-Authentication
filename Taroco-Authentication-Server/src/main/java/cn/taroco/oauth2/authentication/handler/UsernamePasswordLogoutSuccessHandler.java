@@ -4,8 +4,8 @@ import cn.taroco.oauth2.authentication.core.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -14,21 +14,21 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 自定义token校验失败返回信息: 通用
+ * 用户名密码退出登录成功处理
  *
  * @author liuht
- * 2019/5/6 10:54
+ * 2019/7/5 17:27
  */
 @Component
-public class CustomExceptionEntryPoint implements AuthenticationEntryPoint {
+public class UsernamePasswordLogoutSuccessHandler implements LogoutSuccessHandler {
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Override
-    public void commence(final HttpServletRequest request, final HttpServletResponse response, final AuthenticationException authException) throws IOException, ServletException {
-        final Response resp = Response.failure(authException.getMessage());
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    public void onLogoutSuccess(final HttpServletRequest request, final HttpServletResponse response, final Authentication authentication) throws IOException, ServletException {
+        final Response resp = Response.success("登出成功");
+        response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         response.getWriter().write(objectMapper.writeValueAsString(resp));
     }

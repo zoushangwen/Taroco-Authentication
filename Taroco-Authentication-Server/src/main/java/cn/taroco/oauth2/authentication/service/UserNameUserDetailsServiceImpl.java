@@ -1,7 +1,6 @@
 package cn.taroco.oauth2.authentication.service;
 
-import cn.taroco.oauth2.authentication.common.UserService;
-import cn.taroco.oauth2.authentication.common.UserVo;
+import cn.taroco.oauth2.authentication.vo.UserVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -16,12 +15,12 @@ import org.springframework.stereotype.Service;
 public class UserNameUserDetailsServiceImpl extends AbstractUserDetailService {
 
     @Autowired
-    private UserService userService;
+    private MockUserService mockUserService;
 
     @Override
     protected UserVo getUserVO(final String username) {
         // 查询用户信息,包含角色列表
-        UserVo userVo = userService.findUserByUsername(username);
+        UserVo userVo = mockUserService.findUserByUsername(username);
         if (userVo == null) {
             throw new UsernameNotFoundException("用户名/密码错误");
         }

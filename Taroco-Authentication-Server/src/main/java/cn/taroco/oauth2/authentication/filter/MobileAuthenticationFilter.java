@@ -1,6 +1,6 @@
 package cn.taroco.oauth2.authentication.filter;
 
-import cn.taroco.oauth2.authentication.common.SecurityConstants;
+import cn.taroco.oauth2.authentication.consts.SecurityConstants;
 import cn.taroco.oauth2.authentication.token.MobileAuthenticationToken;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;

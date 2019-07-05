@@ -1,7 +1,7 @@
 package cn.taroco.oauth2.authentication.token;
 
-import cn.taroco.oauth2.authentication.common.SecurityConstants;
-import cn.taroco.oauth2.authentication.common.UserVo;
+import cn.taroco.oauth2.authentication.consts.SecurityConstants;
+import cn.taroco.oauth2.authentication.vo.UserVo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;

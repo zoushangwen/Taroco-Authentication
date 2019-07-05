@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.common;
+package cn.taroco.oauth2.authentication.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

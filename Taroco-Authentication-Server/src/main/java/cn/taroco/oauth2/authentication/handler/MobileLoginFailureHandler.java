@@ -1,6 +1,6 @@
 package cn.taroco.oauth2.authentication.handler;
 
-import cn.taroco.oauth2.authentication.common.Response;
+import cn.taroco.oauth2.authentication.core.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

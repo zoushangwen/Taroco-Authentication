@@ -1,6 +1,6 @@
 package cn.taroco.oauth2.authentication.controller;
 
-import cn.taroco.oauth2.authentication.common.Response;
+import cn.taroco.oauth2.authentication.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;

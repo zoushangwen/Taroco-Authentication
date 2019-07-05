@@ -1,6 +1,6 @@
 package cn.taroco.oauth2.authentication.controller;
 
-import cn.taroco.oauth2.authentication.common.Response;
+import cn.taroco.oauth2.authentication.core.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;

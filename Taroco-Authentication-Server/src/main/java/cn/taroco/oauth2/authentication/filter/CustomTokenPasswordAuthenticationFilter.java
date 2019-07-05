@@ -1,7 +1,7 @@
 package cn.taroco.oauth2.authentication.filter;
 
-import cn.taroco.oauth2.authentication.common.Response;
-import cn.taroco.oauth2.authentication.common.SecurityConstants;
+import cn.taroco.oauth2.authentication.core.Response;
+import cn.taroco.oauth2.authentication.consts.SecurityConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +54,8 @@ public class CustomTokenPasswordAuthenticationFilter extends OncePerRequestFilte
         String[] clientDetails = this.isHasClientDetails(request);
 
         if (clientDetails == null) {
-            log.warn("No clients or clients is invalid in request header");
-            final Response resp = Response.failure("No clients or clients is invalid in request header");
+            log.warn("No client or client is invalid in request header");
+            final Response resp = Response.failure("No client or client is invalid in request header");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
             response.getWriter().write(objectMapper.writeValueAsString(resp));
