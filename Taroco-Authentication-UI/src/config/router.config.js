@@ -16,17 +16,17 @@ export const asyncRouterMap = [
         component: () => import('@/views/taroco/home/Index'),
         meta: { title: '首页', icon: 'home' }
       },
-      // clients
+      // client
       {
-        path: '/clients',
-        redirect: '/clients/index',
+        path: '/client',
+        redirect: '/client/index',
         component: PageView,
         meta: { title: '客户端', icon: 'desktop' },
         children: [
           {
-            path: '/clients/index',
+            path: '/client/index',
             name: 'clients',
-            component: () => import('@/views/taroco/clients/Index'),
+            component: () => import('@/views/taroco/client/Index'),
             meta: { title: '客户端管理', icon: 'ie' }
           }
         ]
