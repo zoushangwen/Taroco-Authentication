@@ -33,11 +33,11 @@ import { STable } from '@/components'
 import CreateClient from './components/CreateClient'
 import { getList, deleteClient } from '@/api/client'
 export default {
-  name: 'Taroco-Clients',
+  name: 'TarocoClients',
   components: {
     STable, CreateClient
   },
-  data() {
+  data () {
     return {
       columns: [
         {
@@ -83,26 +83,26 @@ export default {
         }).then(res => {
           return res.result
         })
-      },
+      }
     }
   },
   methods: {
     /**
      * 点击新增
      */
-    handleAdd() {
+    handleAdd () {
       this.$refs.CreateClient.init()
     },
     /**
      * 编辑
      */
-    handleEdit(record) {
+    handleEdit (record) {
       this.$refs.CreateClient.init(record.clientId)
     },
     /**
      * 删除
      */
-    handleDelete(record) {
+    handleDelete (record) {
       this.$confirm({
         title: '操作确认',
         content: '是否确认删除客户端: ' + record.appName + ' ?',
@@ -119,9 +119,9 @@ export default {
     /**
      * 刷新列表
      */
-    refreshList() {
+    refreshList () {
       this.$refs.table.refresh(true)
     }
-  },
+  }
 }
 </script>

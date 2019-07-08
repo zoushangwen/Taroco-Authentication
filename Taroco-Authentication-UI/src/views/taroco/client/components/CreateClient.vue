@@ -1,19 +1,19 @@
 <template>
   <a-modal
-      :title="isAdd | titleFilter"
-      :width="800"
-      v-model="visible"
-      @ok="handleOk"
-      @cancel="resetForm"
-    >
+    :title="isAdd | titleFilter"
+    :width="800"
+    v-model="visible"
+    @ok="handleOk"
+    @cancel="resetForm"
+  >
     <a-form :form="form">
 
       <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="客户端名称"
-          hasFeedback
-        >
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="客户端名称"
+        hasFeedback
+      >
         <a-input
           :disabled="!isAdd"
           v-decorator="[
@@ -24,12 +24,12 @@
       </a-form-item>
 
       <a-form-item
-          v-if="isAdd"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="客户端密钥"
-          hasFeedback
-        >
+        v-if="isAdd"
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="客户端密钥"
+        hasFeedback
+      >
         <a-input
           type="password"
           v-decorator="[
@@ -40,11 +40,11 @@
       </a-form-item>
 
       <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="授权类型"
-          hasFeedback
-        >
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="授权类型"
+        hasFeedback
+      >
         <a-select
           mode="multiple"
           v-decorator="[
@@ -58,12 +58,12 @@
       </a-form-item>
 
       <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="权限范围"
-          hasFeedback
-        >
-        <a-select 
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="权限范围"
+        hasFeedback
+      >
+        <a-select
           mode="multiple"
           v-decorator="[
             'scope',
@@ -77,25 +77,25 @@
       </a-form-item>
 
       <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="转发地址"
-          hasFeedback
-        >
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="转发地址"
+        hasFeedback
+      >
         <a-input
           v-decorator="[
             'webServerRedirectUri',
             {rules: [{ required: true, message: '请输入转发地址' },
-            {pattern: /^(https?|ftp):\/\/([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/, message: '请输入合法的转发地址' }]}
+                     {pattern: /^(https?|ftp):\/\/([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/, message: '请输入合法的转发地址'}]}
           ]"
         />
       </a-form-item>
 
       <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="自动认证"
-        >
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="自动认证"
+      >
         <a-radio-group
           v-decorator="[
             'autoapprove',
@@ -115,7 +115,7 @@
 import { addClient, getClient, updateClient } from '@/api/client'
 export default {
   name: 'CreateClient',
-  data() {
+  data () {
     return {
       clientId: null,
       visible: false,
@@ -144,7 +144,7 @@ export default {
     /**
      * 页面初始化
      */
-    init(clientId) {
+    init (clientId) {
       const that = this
       this.isAdd = true
       if (clientId) {
@@ -166,7 +166,7 @@ export default {
         this.visible = true
       }
     },
-    handleOk() {
+    handleOk () {
       this.form.validateFields((err, values) => {
         if (!err) {
           if (this.isAdd) {
@@ -192,9 +192,9 @@ export default {
     /**
      * 重置表单
      */
-    resetForm() {
+    resetForm () {
       this.form.resetFields()
     }
-  },
+  }
 }
 </script>

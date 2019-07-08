@@ -2,9 +2,9 @@
   <div class="footer">
     <div class="copyright">
       Copyright
-      <a-icon type="copyright" /> 2018 
-      <a-icon type="github" /> 
-      <a href="https://github.com/liuht777/Taroco-Authentication"> Taroco Authentication </a> 
+      <a-icon type="copyright" /> 2018
+      <a-icon type="github" />
+      <a href="https://github.com/liuht777/Taroco-Authentication"> Taroco Authentication </a>
       <span>统一认证</span>
     </div>
   </div>
