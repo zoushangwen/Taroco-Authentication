@@ -21,7 +21,7 @@ export const asyncRouterMap = [
         path: '/client',
         redirect: '/client/index',
         component: PageView,
-        meta: { title: '客户端', icon: 'desktop' },
+        meta: { title: '系统设置', icon: 'setting' },
         children: [
           {
             path: '/client/index',

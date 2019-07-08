@@ -20,6 +20,8 @@ public class OauthClient {
     @TableId
     private String clientId;
 
+    private String appName;
+
     private String resourceIds;
 
     private String clientSecret;
@@ -42,6 +44,7 @@ public class OauthClient {
 
     public OauthClient(final OauthClientVo vo) {
         this.setClientId(vo.getClientId());
+        this.setAppName(vo.getAppName());
         this.setResourceIds(CollUtil.join(vo.getResourceIds(), StrUtil.COMMA));
         this.setClientSecret(vo.getClientSecret());
         this.setScope(CollUtil.join(vo.getScope(), StrUtil.COMMA));

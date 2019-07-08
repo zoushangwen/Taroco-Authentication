@@ -41,6 +41,13 @@ service.interceptors.request.use(config => {
 
 // response interceptor
 service.interceptors.response.use((response) => {
+  const { status, errorMessage } = response.data
+  if (status === 'FAILED') {
+    notification.error({
+      message: '请求错误',
+      description: errorMessage
+    })
+  }
   return response.data
 }, err)
 

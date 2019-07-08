@@ -1,11 +1,13 @@
 package cn.taroco.oauth2.authentication.controller;
 
+import cn.taroco.oauth2.authentication.controller.groups.Add;
 import cn.taroco.oauth2.authentication.core.Response;
 import cn.taroco.oauth2.authentication.service.client.OauthClientService;
 import cn.taroco.oauth2.authentication.vo.OauthClientVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 /**
  * 客户端管理Controller
@@ -47,7 +51,7 @@ public class OauthClientController {
      * @return
      */
     @PutMapping
-    public ResponseEntity<Response> update(@RequestBody OauthClientVo vo) {
+    public ResponseEntity<Response> update(@Valid @RequestBody OauthClientVo vo) {
 
         return ResponseEntity.ok(Response.success(oauthClientService.update(vo)));
     }
@@ -59,7 +63,7 @@ public class OauthClientController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<Response> add(@RequestBody OauthClientVo vo) {
+    public ResponseEntity<Response> add(@Validated(Add.class) @RequestBody OauthClientVo vo) {
 
         return ResponseEntity.ok(Response.success(oauthClientService.add(vo)));
     }

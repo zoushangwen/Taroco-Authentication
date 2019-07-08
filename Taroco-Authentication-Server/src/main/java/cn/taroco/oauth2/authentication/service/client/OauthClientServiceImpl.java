@@ -9,6 +9,8 @@ import cn.taroco.oauth2.authentication.vo.OauthClientVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,6 +22,9 @@ import org.springframework.stereotype.Service;
 @SuppressWarnings("unchecked")
 @Service
 public class OauthClientServiceImpl extends ServiceImpl<OauthClientMapper, OauthClient> implements OauthClientService {
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     @Override
     public OauthClientVo getVo(final String clientId) {
@@ -37,6 +42,7 @@ public class OauthClientServiceImpl extends ServiceImpl<OauthClientMapper, Oauth
 
     @Override
     public Boolean add(final OauthClientVo vo) {
+        vo.setClientSecret(encoder.encode(vo.getClientSecret()));
         if (StrUtil.isNotEmpty(vo.getClientId())) {
             throw new BusiException("存在客户端ID,无法新增");
         }
