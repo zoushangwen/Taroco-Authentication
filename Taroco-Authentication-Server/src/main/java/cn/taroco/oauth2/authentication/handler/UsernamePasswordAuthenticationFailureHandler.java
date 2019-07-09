@@ -2,6 +2,7 @@ package cn.taroco.oauth2.authentication.handler;
 
 import cn.taroco.oauth2.authentication.core.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -20,6 +21,7 @@ import java.io.IOException;
  * 2019/7/3 14:42
  */
 @Component
+@Slf4j
 public class UsernamePasswordAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     @Autowired
@@ -29,6 +31,9 @@ public class UsernamePasswordAuthenticationFailureHandler implements Authenticat
     public void onAuthenticationFailure(final HttpServletRequest request,
                                         final HttpServletResponse response,
                                         final AuthenticationException exception) throws IOException, ServletException {
+        if (log.isDebugEnabled()) {
+            log.debug("UsernamePasswordAuthenticationFailureHandler:" + exception.getMessage());
+        }
         final Response resp = Response.failure(exception.getMessage());
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);

@@ -2,6 +2,7 @@ package cn.taroco.oauth2.authentication.handler;
 
 import cn.taroco.oauth2.authentication.core.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -20,6 +21,7 @@ import java.io.IOException;
  * 2019/5/6 10:54
  */
 @Component
+@Slf4j
 public class CustomExceptionEntryPoint implements AuthenticationEntryPoint {
 
     @Autowired
@@ -27,6 +29,9 @@ public class CustomExceptionEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(final HttpServletRequest request, final HttpServletResponse response, final AuthenticationException authException) throws IOException, ServletException {
+        if (log.isDebugEnabled()) {
+            log.debug("CustomExceptionEntryPoint:" + authException.getMessage());
+        }
         final Response resp = Response.failure(authException.getMessage());
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);

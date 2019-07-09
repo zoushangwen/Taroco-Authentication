@@ -42,7 +42,6 @@ taroco:
     url-permit-all:
       - /
       - /actuator/**
-      - /authentication/**
       - /oauth/mobile
       - /webjars/**
       - /static/**

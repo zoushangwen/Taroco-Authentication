@@ -2,6 +2,7 @@ package cn.taroco.oauth2.authentication.handler;
 
 import cn.taroco.oauth2.authentication.core.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,6 +21,7 @@ import java.io.IOException;
  * 2019/5/6 11:02
  */
 @Component
+@Slf4j
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Autowired
@@ -27,6 +29,9 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(final HttpServletRequest request, final HttpServletResponse response, final AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        if (log.isDebugEnabled()) {
+            log.debug("CustomAccessDeniedHandler:" + accessDeniedException.getMessage());
+        }
         final Response resp = Response.failure(accessDeniedException.getMessage());
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);

@@ -31,6 +31,9 @@ public class MobileLoginFailureHandler implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(final HttpServletRequest request,
                                         final HttpServletResponse response,
                                         final AuthenticationException exception) throws IOException, ServletException {
+        if (log.isDebugEnabled()) {
+            log.debug("MobileLoginFailureHandler:" + exception.getMessage());
+        }
         final Response resp = Response.failure(exception.getMessage());
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);

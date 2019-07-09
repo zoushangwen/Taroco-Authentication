@@ -9,6 +9,8 @@ import org.springframework.security.oauth2.common.DefaultThrowableAnalyzer;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InsufficientScopeException;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
+import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
+import org.springframework.security.oauth2.provider.error.DefaultWebResponseExceptionTranslator;
 import org.springframework.security.oauth2.provider.error.WebResponseExceptionTranslator;
 import org.springframework.security.web.util.ThrowableAnalyzer;
 import org.springframework.stereotype.Component;
@@ -17,7 +19,8 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import java.io.IOException;
 
 /**
- * 登录发生异常时指定 exceptionTranslator
+ * 自定义Oauth2异常处理, 重写{@link DefaultWebResponseExceptionTranslator}
+ * 关于OAuth2Exception的处理, 默认是放在{@link AuthorizationEndpoint}当中的 @ExceptionHandler(OAuth2Exception.class)
  *
  * @author liuht
  * 2019/5/6 10:45
