@@ -59,7 +59,7 @@ export default {
           scopedSlots: { customRender: 'scopes' }
         },
         {
-          title: '转发地址',
+          title: '重定向地址',
           dataIndex: 'webServerRedirectUri',
           scopedSlots: { customRender: 'webServerRedirectUri' }
         },
