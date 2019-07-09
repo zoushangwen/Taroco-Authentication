@@ -14,7 +14,18 @@ public class CustomOauth2Exception extends OAuth2Exception {
 
     private static final long serialVersionUID = -1003326583561699922L;
 
+    private String oauth2ErrorCode;
+
     public CustomOauth2Exception(final String msg, final Throwable t) {
         super(msg, t);
+    }
+
+    @Override
+    public String getOAuth2ErrorCode() {
+        return this.oauth2ErrorCode;
+    }
+
+    public void setOauth2ErrorCode(final String oauth2ErrorCode) {
+        this.oauth2ErrorCode = oauth2ErrorCode;
     }
 }

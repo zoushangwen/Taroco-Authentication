@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @RequestMapping("/oauth")
-public class AuthenticationController {
+public class TokenController {
 
     @Autowired
     private ConsumerTokenServices consumerTokenServices;

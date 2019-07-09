@@ -1,13 +1,13 @@
 package cn.taroco.oauth2.authentication.config;
 
 import cn.taroco.oauth2.authentication.consts.SecurityConstants;
-import cn.taroco.oauth2.authentication.vo.UserVo;
-import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
-import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
 import cn.taroco.oauth2.authentication.exception.CustomWebResponseExceptionTranslator;
 import cn.taroco.oauth2.authentication.filter.CustomTokenPasswordAuthenticationFilter;
+import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
+import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
 import cn.taroco.oauth2.authentication.token.CustomerAccessTokenConverter;
+import cn.taroco.oauth2.authentication.vo.UserVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -171,6 +171,10 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
         security
                 .tokenKeyAccess("isAuthenticated()")
                 .checkTokenAccess("permitAll()")
+                //allowFormAuthenticationForClients是为了注册clientCredentialsTokenEndpointFilter
+                //clientCredentialsTokenEndpointFilter,解析request中的client_id和client_secret
+                //构造成UsernamePasswordAuthenticationToken,然后通过UserDetailsService查询作简单的认证而已
+                //一般是针对password模式和client_credentials 主要是让/oauth/token支持client_id以及client_secret作登录认证
                 .allowFormAuthenticationForClients()
                 .authenticationEntryPoint(exceptionEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler)

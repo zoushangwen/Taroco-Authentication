@@ -24,8 +24,8 @@ public class CustomOauth2ExceptionSerializer extends StdSerializer<CustomOauth2E
     @Override
     public void serialize(final CustomOauth2Exception e, final JsonGenerator jsonGenerator, final SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeStringField("errorCode", "0006");
-        jsonGenerator.writeStringField("errorMessage", e.getOAuth2ErrorCode() + ":" + e.getMessage());
+        jsonGenerator.writeStringField("errorCode", e.getOAuth2ErrorCode());
+        jsonGenerator.writeStringField("errorMessage", e.getMessage());
         jsonGenerator.writeStringField("status", Response.Status.FAILED.name());
         jsonGenerator.writeEndObject();
     }
