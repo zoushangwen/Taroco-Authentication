@@ -90,7 +90,7 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
 
         final List<String> urlPermitAll = oauth2Properties.getUrlPermitAll();
         urlPermitAll.forEach(url -> registry.antMatchers(url).permitAll());
-        registry.anyRequest().authenticated().and().csrf().disable();
+        registry.anyRequest().authenticated().and().cors().and().csrf().disable();
     }
 
     @Override
