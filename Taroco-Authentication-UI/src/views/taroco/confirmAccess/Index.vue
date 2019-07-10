@@ -37,7 +37,7 @@ export default {
         'user_oauth_approval': true
       }
       this.scope.forEach(s => {
-        params['scopo.' + s] = value
+        params['scope.' + s] = value
       })
       confirmAccess(qs.stringify(params))
     }
