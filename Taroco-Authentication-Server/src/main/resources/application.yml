@@ -40,7 +40,6 @@ taroco:
       secret: taroco!@#$
       alias: taroco
     url-permit-all:
-      - /
       - /actuator/**
       - /oauth/mobile
       - /webjars/**
@@ -52,3 +51,4 @@ taroco:
       - /**/*.svg
       - /**/*.woff2
       - /**/*.js
+      - /**/*.ico

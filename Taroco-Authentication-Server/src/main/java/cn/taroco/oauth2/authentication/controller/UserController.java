@@ -8,13 +8,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * 描述
+ * 用户Controller
  *
  * @author liuht
  * 2019/7/4 15:44
  */
 @Controller
 public class UserController {
+
+
 
     /**
      * 查询登录用户

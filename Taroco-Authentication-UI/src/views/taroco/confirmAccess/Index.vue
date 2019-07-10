@@ -1,39 +1,25 @@
 <template>
   <div class="exception">
     <div class="imgBlock">
-      <div class="imgEle" :style="{backgroundImage: `url(${config[type].img})`}">
+      <div class="imgEle" :style="{backgroundImage: `url(https://gw.alipayobjects.com/zos/rmsportal/wZcnGqRDyhPOEYFcZDnb.svg)`}">
       </div>
     </div>
     <div class="content">
-      <h1>{{ config[type].title }}</h1>
-      <div class="desc">{{ config[type].desc }}</div>
+      <h1>客户端授权请求</h1>
+      <div class="desc">授权后应用将获得你的用户信息及相关权限。</div>
       <div class="actions">
-        <a-button type="primary" @click="handleToHome">返回首页</a-button>
+        <a-button type="danger" @click="handleConfirm(false)">拒绝</a-button>
+        <a-button type="primary" @click="handleConfirm(true)">授权</a-button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import types from './type'
-
 export default {
-  name: 'Exception',
-  props: {
-    type: {
-      type: String,
-      default: '404'
-    }
-  },
-  data () {
-    return {
-      config: types
-    }
-  },
+  name: 'ConfirmAccess',
   methods: {
-    handleToHome () {
-      this.$router.push({ name: 'home' })
-    }
+    handleConfirm (value) {}
   }
 }
 </script>

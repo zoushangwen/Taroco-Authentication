@@ -80,8 +80,11 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
                         .formLogin().loginPage("/").permitAll()
                         .loginProcessingUrl("/login").permitAll()
                         .and().logout().logoutUrl("/logout").permitAll().logoutSuccessHandler(logoutSuccessHandler)
+                        // 异常处理filter: ExceptionTranslationFilter
                         .and().exceptionHandling()
-                        .authenticationEntryPoint(exceptionEntryPoint)
+                        // 匿名用户访问无权限资源时的异常
+                        //.authenticationEntryPoint(exceptionEntryPoint)
+                        // 认证过的用户访问无权限资源时的异常
                         .accessDeniedHandler(accessDeniedHandler)
                         .and().authorizeRequests();
 

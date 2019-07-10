@@ -40,6 +40,7 @@ export const asyncRouterMap = [
  * @type { *[] }
  */
 export const constantRouterMap = [
+  // 登录界面
   {
     path: '/user',
     component: UserLayout,
@@ -52,6 +53,11 @@ export const constantRouterMap = [
         component: () => import(/* webpackChunkName: "user" */ '@/views/user/Login')
       }
     ]
+  },
+  // 认证界面
+  {
+    path: '/confirm_access',
+    component: () => import('@/views/taroco/confirmAccess/Index')
   },
   // Exception
   {
