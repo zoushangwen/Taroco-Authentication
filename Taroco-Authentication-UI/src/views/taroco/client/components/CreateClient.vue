@@ -11,7 +11,7 @@
       <a-form-item
         :labelCol="labelCol"
         :wrapperCol="wrapperCol"
-        label="客户端名称"
+        label="应用名称"
         hasFeedback
       >
         <a-input
@@ -27,14 +27,14 @@
         v-if="isAdd"
         :labelCol="labelCol"
         :wrapperCol="wrapperCol"
-        label="客户端密钥"
+        label="应用密钥"
         hasFeedback
       >
         <a-input
           type="password"
           v-decorator="[
             'clientSecret',
-            {rules: [{ required: true, max: 50, message: '请输入客户端密钥,50以内' }]
+            {rules: [{ required: true, max: 50, message: '请输入应用密钥,50以内' }]
             }]"
         />
       </a-form-item>

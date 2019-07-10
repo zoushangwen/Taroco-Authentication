@@ -5,21 +5,42 @@
       </div>
     </div>
     <div class="content">
-      <h1>客户端授权请求</h1>
-      <div class="desc">授权后应用将获得你的用户信息及相关权限。</div>
+      <h1>应用授权请求</h1>
+      <div class="desc">同意授权后将允许应用{{ appName }}，获得你的用户信息及以下权限：</div>
+      <div class="desc">
+        <a-tag v-for="(item, index) in scope" :key="index" color="#2db7f5">{{ item }}</a-tag>
+      </div>
       <div class="actions">
-        <a-button type="danger" @click="handleConfirm(false)">拒绝</a-button>
-        <a-button type="primary" @click="handleConfirm(true)">授权</a-button>
+        <a-button type="danger" @click="handleConfirm(false)">拒绝授权</a-button>
+        <a-button type="primary" @click="handleConfirm(true)">同意授权</a-button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { confirmAccess } from '@/api/client'
+import qs from 'qs'
 export default {
   name: 'ConfirmAccess',
+  data () {
+    return {
+      appName: this.$route.query.appName,
+      clientId: this.$route.query.clientId,
+      redirectUri: this.$route.query.redirectUri,
+      scope: this.$route.query.scope.split(',')
+    }
+  },
   methods: {
-    handleConfirm (value) {}
+    handleConfirm (value) {
+      const params = {
+        'user_oauth_approval': true
+      }
+      this.scope.forEach(s => {
+        params['scopo.' + s] = value
+      })
+      confirmAccess(qs.stringify(params))
+    }
   }
 }
 </script>
@@ -67,15 +88,15 @@ export default {
       margin-bottom: 24px;
       color: #434e59;
       font-weight: 600;
-      font-size: 72px;
-      line-height: 72px;
+      font-size: 28px;
+      line-height: 28px;
     }
 
     .desc {
       margin-bottom: 16px;
       color: @text-color-secondary;
-      font-size: 20px;
-      line-height: 28px;
+      font-size: 16px;
+      line-height: 16px;
     }
 
     .actions {

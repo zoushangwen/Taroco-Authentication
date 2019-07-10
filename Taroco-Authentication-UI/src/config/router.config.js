@@ -27,7 +27,7 @@ export const asyncRouterMap = [
             path: '/client/index',
             name: 'clients',
             component: () => import('@/views/taroco/client/Index'),
-            meta: { title: '客户端管理', icon: 'desktop' }
+            meta: { title: '应用管理', icon: 'desktop' }
           }
         ]
       }

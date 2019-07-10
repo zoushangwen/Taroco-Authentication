@@ -1,11 +1,15 @@
 package cn.taroco.oauth2.authentication.controller;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.taroco.oauth2.authentication.core.Response;
+import cn.taroco.oauth2.authentication.entity.OauthClient;
+import cn.taroco.oauth2.authentication.service.client.OauthClientService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
+import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.WhitelabelApprovalEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.WhitelabelErrorEndpoint;
@@ -15,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -30,6 +33,10 @@ import java.util.Map;
 @Controller
 @SessionAttributes("authorizationRequest")
 public class AuthorizationController {
+
+    @Autowired
+    private OauthClientService oauthClientService;
+
     /**
      * 授权页面 重写{@link WhitelabelApprovalEndpoint}
      *
@@ -37,15 +44,15 @@ public class AuthorizationController {
      * @return
      */
     @RequestMapping("/oauth/confirm_access")
-    public String authorizePage(Map<String, Object> model, HttpServletRequest request) {
-        // 获取用户名
-        String userName = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        model.put("userName", userName);
-        @SuppressWarnings("unchecked")
-        Map<String, String> scopes = (Map<String, String>) (model.containsKey("scopes") ? model.get("scopes") : request
-                .getAttribute("scopes"));
-        model.put("scopes", new ArrayList<>(scopes.keySet()));
-        return "/confirm_access";
+    public String authorizePage(Map<String, Object> model) {
+        AuthorizationRequest authorizationRequest = (AuthorizationRequest) model.get("authorizationRequest");
+        final OauthClient oauthClient = oauthClientService.getById(authorizationRequest.getClientId());
+        String str = "redirect:/confirm_access?clientId={}&scope={}&redirectUri={}&appName={}";
+        return StrUtil.format(str,
+                authorizationRequest.getClientId(),
+                CollUtil.join(authorizationRequest.getScope(), StrUtil.COMMA),
+                authorizationRequest.getRedirectUri(),
+                oauthClient.getAppName());
     }
 
     /**

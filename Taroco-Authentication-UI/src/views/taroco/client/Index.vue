@@ -41,11 +41,11 @@ export default {
     return {
       columns: [
         {
-          title: '客户端名称',
+          title: '应用名称',
           dataIndex: 'appName'
         },
         {
-          title: '客户端ID',
+          title: '应用ID',
           dataIndex: 'clientId'
         },
         {
@@ -105,7 +105,7 @@ export default {
     handleDelete (record) {
       this.$confirm({
         title: '操作确认',
-        content: '是否确认删除客户端: ' + record.appName + ' ?',
+        content: '是否确认删除应用: ' + record.appName + ' ?',
         onOk: () => {
           deleteClient(record.clientId).then(res => {
             if (res.status === 'SUCCEED') {
