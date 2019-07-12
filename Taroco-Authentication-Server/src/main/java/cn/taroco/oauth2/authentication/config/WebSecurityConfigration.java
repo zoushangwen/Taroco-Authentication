@@ -1,15 +1,15 @@
 package cn.taroco.oauth2.authentication.config;
 
 import cn.taroco.oauth2.authentication.filter.CustomUsernamePasswordAuthenticationFilter;
-import cn.taroco.oauth2.authentication.filter.MobileAuthenticationFilter;
+import cn.taroco.oauth2.authentication.filter.MobileTokenAuthenticationFilter;
 import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
 import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
-import cn.taroco.oauth2.authentication.handler.MobileLoginFailureHandler;
-import cn.taroco.oauth2.authentication.handler.MobileLoginSuccessHandler;
+import cn.taroco.oauth2.authentication.handler.MobileTokenLoginFailureHandler;
+import cn.taroco.oauth2.authentication.handler.MobileTokenLoginSuccessHandler;
 import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationFailureHandler;
 import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationSuccessHandler;
 import cn.taroco.oauth2.authentication.handler.UsernamePasswordLogoutSuccessHandler;
-import cn.taroco.oauth2.authentication.provider.MobileAuthenticationProvider;
+import cn.taroco.oauth2.authentication.provider.MobileTokenAuthenticationProvider;
 import cn.taroco.oauth2.authentication.redis.TarocoRedisRepository;
 import cn.taroco.oauth2.authentication.service.MobileUserDetailsService;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
@@ -51,10 +51,10 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     private TarocoRedisRepository redisRepository;
 
     @Autowired
-    private MobileLoginFailureHandler mobileLoginFailureHandler;
+    private MobileTokenLoginFailureHandler mobileTokenLoginFailureHandler;
 
     @Autowired
-    private MobileLoginSuccessHandler mobileLoginSuccessHandler;
+    private MobileTokenLoginSuccessHandler mobileTokenLoginSuccessHandler;
 
     @Autowired
     private UsernamePasswordAuthenticationSuccessHandler successHandler;
@@ -75,7 +75,7 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry =
                 http
-                        .addFilterAfter(mobileAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                        .addFilterAfter(mobileTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                         .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                         .formLogin().loginPage("/").permitAll()
                         .loginProcessingUrl("/login").permitAll()
@@ -97,7 +97,7 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .authenticationProvider(daoAuthenticationProvider())
-                .authenticationProvider(mobileAuthenticationProvider());
+                .authenticationProvider(mobileTokenAuthenticationProvider());
     }
 
     @Override
@@ -157,11 +157,11 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
      * 手机号登录过滤器
      */
     @Bean
-    public MobileAuthenticationFilter mobileAuthenticationFilter() throws Exception {
-        final MobileAuthenticationFilter filter = new MobileAuthenticationFilter();
+    public MobileTokenAuthenticationFilter mobileTokenAuthenticationFilter() throws Exception {
+        final MobileTokenAuthenticationFilter filter = new MobileTokenAuthenticationFilter();
         filter.setAuthenticationManager(authenticationManagerBean());
-        filter.setAuthenticationSuccessHandler(mobileLoginSuccessHandler);
-        filter.setAuthenticationFailureHandler(mobileLoginFailureHandler);
+        filter.setAuthenticationSuccessHandler(mobileTokenLoginSuccessHandler);
+        filter.setAuthenticationFailureHandler(mobileTokenLoginFailureHandler);
         return filter;
     }
 
@@ -169,8 +169,8 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
      * 手机号登录认证逻辑
      */
     @Bean
-    public MobileAuthenticationProvider mobileAuthenticationProvider() {
-        final MobileAuthenticationProvider provider = new MobileAuthenticationProvider();
+    public MobileTokenAuthenticationProvider mobileTokenAuthenticationProvider() {
+        final MobileTokenAuthenticationProvider provider = new MobileTokenAuthenticationProvider();
         provider.setRedisRepository(redisRepository);
         provider.setUserDetailsService(mobileUserDetailsService);
         provider.setHideUserNotFoundExceptions(false);

@@ -40,6 +40,7 @@ taroco:
       secret: taroco!@#$
       alias: taroco
     url-permit-all:
+      - /smsCode/*
       - /actuator/**
       - /oauth/mobile
       - /webjars/**

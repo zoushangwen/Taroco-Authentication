@@ -1,7 +1,7 @@
 package cn.taroco.oauth2.authentication.filter;
 
 import cn.taroco.oauth2.authentication.consts.SecurityConstants;
-import cn.taroco.oauth2.authentication.token.MobileAuthenticationToken;
+import cn.taroco.oauth2.authentication.token.MobileTokenAuthenticationToken;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -17,20 +17,20 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 手机号登录认证filter
+ * 手机号获取token登录认证filter
  *
  * @author liuht
  * 2019/5/13 15:37
  * @see UsernamePasswordAuthenticationFilter
  */
-public class MobileAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+public class MobileTokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private static final String SPRING_SECURITY_RESTFUL_PHONE_KEY = "mobile";
     private static final String SPRING_SECURITY_RESTFUL_VERIFY_CODE_KEY = "code";
 
     private boolean postOnly = true;
 
-    public MobileAuthenticationFilter() {
+    public MobileTokenAuthenticationFilter() {
         // 定义一个指定路径的手机号登录前缀
         super(new AntPathRequestMatcher(SecurityConstants.MOBILE_TOKEN_URL, HttpMethod.POST.name()));
     }
@@ -51,7 +51,7 @@ public class MobileAuthenticationFilter extends AbstractAuthenticationProcessing
         credentials = obtainParameter(request, SPRING_SECURITY_RESTFUL_VERIFY_CODE_KEY);
 
         principal = principal.trim();
-        authRequest = new MobileAuthenticationToken(principal, credentials);
+        authRequest = new MobileTokenAuthenticationToken(principal, credentials);
         setDetails(request, authRequest);
         return this.getAuthenticationManager().authenticate(authRequest);
     }

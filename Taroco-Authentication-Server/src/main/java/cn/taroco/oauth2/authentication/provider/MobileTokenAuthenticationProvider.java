@@ -3,7 +3,7 @@ package cn.taroco.oauth2.authentication.provider;
 import cn.hutool.core.util.StrUtil;
 import cn.taroco.oauth2.authentication.consts.CacheConstants;
 import cn.taroco.oauth2.authentication.redis.TarocoRedisRepository;
-import cn.taroco.oauth2.authentication.token.MobileAuthenticationToken;
+import cn.taroco.oauth2.authentication.token.MobileTokenAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -15,14 +15,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
- * 定义手机号登录校验逻辑
+ * 定义手机号获取token校验逻辑
  *
  * @author liuht
  * 2019/5/13 15:25
  * @see DaoAuthenticationProvider
  */
 @Slf4j
-public class MobileAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+public class MobileTokenAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
     private UserDetailsService userDetailsService;
 
@@ -30,7 +30,7 @@ public class MobileAuthenticationProvider extends AbstractUserDetailsAuthenticat
 
     @Override
     protected Authentication createSuccessAuthentication(final Object principal, final Authentication authentication, final UserDetails user) {
-        final MobileAuthenticationToken token = new MobileAuthenticationToken(principal, authentication.getCredentials(), user.getAuthorities());
+        final MobileTokenAuthenticationToken token = new MobileTokenAuthenticationToken(principal, authentication.getCredentials(), user.getAuthorities());
         token.setDetails(authentication.getDetails());
         return token;
     }
@@ -74,7 +74,7 @@ public class MobileAuthenticationProvider extends AbstractUserDetailsAuthenticat
 
     @Override
     public boolean supports(final Class<?> authentication) {
-        return MobileAuthenticationToken.class.isAssignableFrom(authentication);
+        return MobileTokenAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
     public UserDetailsService getUserDetailsService() {

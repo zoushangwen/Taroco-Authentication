@@ -22,7 +22,7 @@ import java.io.IOException;
  */
 @Component
 @Slf4j
-public class MobileLoginFailureHandler implements AuthenticationFailureHandler {
+public class MobileTokenLoginFailureHandler implements AuthenticationFailureHandler {
 
     @Autowired
     private ObjectMapper objectMapper;

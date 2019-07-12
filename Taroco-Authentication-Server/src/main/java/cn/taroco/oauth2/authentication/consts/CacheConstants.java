@@ -22,4 +22,9 @@ public interface CacheConstants {
      * 验证码缓存key
      */
     String DEFAULT_CODE_KEY = PREFIX + "code" + SPLIT;
+
+    /**
+     * 默认过期时间 60秒
+     */
+    int DEFAULT_EXPIRE_SECONDS = 60;
 }

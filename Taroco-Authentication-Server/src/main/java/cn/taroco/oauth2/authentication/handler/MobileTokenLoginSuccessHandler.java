@@ -30,7 +30,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 手机号登录成功, 返回token
+ * 手机号登录成功, 直接返回token
  *
  * @author liuht
  * 2019/5/15 16:03
@@ -39,7 +39,7 @@ import java.nio.charset.StandardCharsets;
 @Component
 @Slf4j
 @Data
-public class MobileLoginSuccessHandler implements AuthenticationSuccessHandler {
+public class MobileTokenLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     @Autowired
     private ObjectMapper objectMapper;

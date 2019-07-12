@@ -44,7 +44,7 @@
         </a-tab-pane>
         <a-tab-pane key="tab2" tab="手机号登录">
           <a-form-item>
-            <a-input size="large" type="text" placeholder="手机号" v-decorator="['mobile', {rules: [{ required: true, pattern: /^1[34578]\d{9}$/, message: '请输入正确的手机号' }], validateTrigger: 'change'}]">
+            <a-input size="large" type="text" placeholder="手机号" v-decorator="['mobile', {rules: [{ required: true, pattern: /^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/, message: '请输入正确的手机号' }], validateTrigger: 'change'}]">
               <a-icon slot="prefix" type="mobile" :style="{ color: 'rgba(0,0,0,.25)' }"/>
             </a-input>
           </a-form-item>
@@ -110,7 +110,7 @@
 <script>
 import { mapActions } from 'vuex'
 import { timeFix } from '@/utils/util'
-
+import { smsCode } from '@/api/user'
 export default {
   components: {},
   data () {
@@ -133,7 +133,7 @@ export default {
   created () {
   },
   methods: {
-    ...mapActions(['Login', 'Logout']),
+    ...mapActions(['Login', 'Logout', 'LoginByMobile']),
     // handler
     handleUsernameOrEmail (rule, value, callback) {
       const { state } = this
@@ -155,7 +155,8 @@ export default {
         form: { validateFields },
         state,
         customActiveKey,
-        Login
+        Login,
+        LoginByMobile
       } = this
 
       state.loginBtn = true
@@ -196,20 +197,20 @@ export default {
             }
           }, 1000)
 
-          // const hide = this.$message.loading('验证码发送中..', 0)
-          // getSmsCaptcha({ mobile: values.mobile }).then(res => {
-          //   setTimeout(hide, 2500)
-          //   this.$notification['success']({
-          //     message: '提示',
-          //     description: '验证码获取成功，您的验证码为：' + res.result.captcha,
-          //     duration: 8
-          //   })
-          // }).catch(err => {
-          //   setTimeout(hide, 1)
-          //   clearInterval(interval)
-          //   state.time = 60
-          //   state.smsSendBtn = false
-          // })
+          const hide = this.$message.loading('验证码发送中..', 0)
+          smsCode(values.mobile).then(res => {
+            setTimeout(hide, 2500)
+            this.$notification['success']({
+              message: '提示',
+              description: '验证码获取成功，您的验证码为：' + res.result,
+              duration: 8
+            })
+          }).catch(() => {
+            setTimeout(hide, 1)
+            clearInterval(interval)
+            state.time = 60
+            state.smsSendBtn = false
+          })
         }
       })
     },

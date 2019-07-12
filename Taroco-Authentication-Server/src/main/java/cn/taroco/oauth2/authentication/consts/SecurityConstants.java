@@ -10,27 +10,7 @@ public interface SecurityConstants {
     /**
      * basic
      */
-    String BASIC = "basic";
-
-    /**
-     * basic
-     */
     String BASIC_HEADER = "Basic ";
-
-    /**
-     * client_id
-     */
-    String CLIENT_ID = "client_id";
-
-    /**
-     * client_secret
-     */
-    String CLIENT_SECRET = "client_secret";
-
-    /**
-     * grant_type
-     */
-    String GRANT_TYPE = "grant_type";
 
     /**
      * AUTHORIZATION name
@@ -53,16 +33,6 @@ public interface SecurityConstants {
     String USER_ROLE_HEADER = "x-user-role";
 
     /**
-     * 角色权限头
-     */
-    String USER_PERMISSION_HEADER = "x-user-permission";
-
-    /**
-     * 标签 header key
-     */
-    String HEADER_LABEL = "x-label";
-
-    /**
      * license key
      */
     String LICENSE_KEY = "license";
@@ -71,26 +41,6 @@ public interface SecurityConstants {
      * 项目的license
      */
     String LICENSE = "made by taroco";
-
-    /**
-     * 授权码模式
-     */
-    String AUTHORIZATION_CODE = "authorization_code";
-
-    /**
-     * 密码模式
-     */
-    String PASSWORD = "password";
-
-    /**
-     * 刷新token
-     */
-    String REFRESH_TOKEN = "refresh_token";
-
-    /**
-     * 传统oauth2 登录路径
-     */
-    String OAUTH_TOKEN_URL = "/oauth/token";
 
     /**
      * 手机号登录路径

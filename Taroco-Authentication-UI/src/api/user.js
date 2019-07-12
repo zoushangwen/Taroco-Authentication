@@ -32,3 +32,30 @@ export function logout () {
     method: 'post'
   })
 }
+
+/**
+ * 发送手机验证码
+ */
+export function smsCode (mobile) {
+  return axios({
+    url: `/smsCode/${mobile}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 手机号登录
+ *
+ * @param {手机号} mobile
+ * @param {验证码} code
+ */
+export const loginByMobile = (mobile, code) => {
+  return axios({
+    url: '/oauth/mobile',
+    headers: {
+      'Authorization': 'Basic dGFyb2NvOnRhcm9jbw=='
+    },
+    method: 'post',
+    params: { mobile, code }
+  })
+}
