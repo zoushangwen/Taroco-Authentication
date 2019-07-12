@@ -22,8 +22,7 @@
 
 ## Postman 接口调试
 
-前端界面已经集成到 Spring Boot，只需要启动一个后端服务即可。
-[postman_collection](docs/Taroco Authentication.postman_collection.json "postman_collection") 已导出，请自行导入到 Postman 进行接口调试。
+前端界面已经集成到 Spring Boot，只需要启动一个后端服务即可。`docs/Taroco Authentication.postman_collection.json` 已导出，请自行导入到 Postman 进行接口调试。
 
 ## 扩展
 
