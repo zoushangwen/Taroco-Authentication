@@ -74,7 +74,7 @@ public class MockUserService {
 
 ## 友情链接
 
-- [spring-security-oauth](http://projects.spring.io/spring-security-oauth/docs/oauth2.html) spring-security-oauth 开发者指南
-- [理解 OAuth 2.0](http://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html) 理解 OAuth 2.0
-- [vue.ant.design](https://vue.ant.design/docs/vue/introduce-cn/) vue.ant.design
-- [Ant Design Pro of Vue](https://pro.loacg.com/docs/getting-started) Ant Design Pro of Vue
+- [spring-security-oauth 开发者指南](http://projects.spring.io/spring-security-oauth/docs/oauth2.html)
+- [理解 OAuth 2.0（阮一峰）](http://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html)
+- [vue.ant.design](https://vue.ant.design/docs/vue/introduce-cn/)
+- [Ant Design Pro of Vue](https://pro.loacg.com/docs/getting-started)
