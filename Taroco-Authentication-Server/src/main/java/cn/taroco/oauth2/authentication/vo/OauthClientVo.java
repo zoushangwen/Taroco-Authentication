@@ -35,7 +35,7 @@ public class OauthClientVo {
     private Collection<String> scope;
 
     @NotNull(message = "授权类型不能为空")
-    @Size(min = 1, max = 4, message = "最少1个授权类型, 最多4个授权类型")
+    @Size(min = 1, max = 5, message = "最少1个授权类型, 最多5个授权类型")
     private Collection<String> authorizedGrantTypes;
 
     @NotNull(message = "重定向地址不能为空")

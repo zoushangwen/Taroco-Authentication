@@ -120,10 +120,7 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
             proxyMode = ScopedProxyMode.INTERFACES
     )
     public ClientDetailsService clientDetailsService() {
-        JdbcClientDetailsService clientDetailsService = new JdbcClientDetailsService(dataSource);
-        clientDetailsService.setSelectClientDetailsSql(SecurityConstants.DEFAULT_SELECT_STATEMENT);
-        clientDetailsService.setFindClientDetailsSql(SecurityConstants.DEFAULT_FIND_STATEMENT);
-        return clientDetailsService;
+        return new JdbcClientDetailsService(dataSource);
     }
 
     @Override
