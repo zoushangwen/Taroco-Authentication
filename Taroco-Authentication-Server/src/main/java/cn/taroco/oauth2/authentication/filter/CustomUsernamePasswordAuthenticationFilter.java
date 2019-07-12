@@ -19,6 +19,7 @@ import java.io.InputStream;
  *
  * @author liuht
  * 2019/7/3 14:09
+ * @see UsernamePasswordAuthenticationFilter
  */
 @Slf4j
 public class CustomUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {

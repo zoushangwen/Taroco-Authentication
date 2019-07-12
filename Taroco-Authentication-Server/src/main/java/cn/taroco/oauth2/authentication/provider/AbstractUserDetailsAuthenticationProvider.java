@@ -26,6 +26,7 @@ import org.springframework.util.Assert;
  *
  * @author liuht
  * 2019/5/13 15:25
+ * @see org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider
  */
 @Slf4j
 public abstract class AbstractUserDetailsAuthenticationProvider implements AuthenticationProvider, InitializingBean, MessageSourceAware {

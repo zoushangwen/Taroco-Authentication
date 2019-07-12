@@ -1,9 +1,8 @@
 package cn.taroco.oauth2.authentication.filter;
 
 import cn.taroco.oauth2.authentication.consts.SecurityConstants;
-import cn.taroco.oauth2.authentication.token.MobileTokenAuthenticationToken;
+import cn.taroco.oauth2.authentication.token.SmsCodeAuthenticationToken;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -17,23 +16,21 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 手机号获取token登录认证filter
- * 通过手机号直接获取 token
+ * 自定义手机号验证码登录系统
  *
  * @author liuht
- * 2019/5/13 15:37
+ * 2019/7/12 14:13
  * @see UsernamePasswordAuthenticationFilter
  */
-public class MobileTokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+public class SmsCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private static final String SPRING_SECURITY_RESTFUL_PHONE_KEY = "mobile";
     private static final String SPRING_SECURITY_RESTFUL_VERIFY_CODE_KEY = "code";
 
     private boolean postOnly = true;
 
-    public MobileTokenAuthenticationFilter() {
-        // 定义一个指定路径的手机号登录前缀
-        super(new AntPathRequestMatcher(SecurityConstants.MOBILE_TOKEN_URL, HttpMethod.POST.name()));
+    public SmsCodeAuthenticationFilter() {
+        super(new AntPathRequestMatcher(SecurityConstants.MOBILE_LOGIN_URL, HttpMethod.POST.name()));
     }
 
     @Override
@@ -42,18 +39,15 @@ public class MobileTokenAuthenticationFilter extends AbstractAuthenticationProce
             throw new AuthenticationServiceException(
                     "Authentication method not supported: " + request.getMethod());
         }
-
-        AbstractAuthenticationToken authRequest;
         String principal;
         String credentials;
-
-        // 手机验证码登陆
+        // 1. 从请求中获取参数 mobile + smsCode
         principal = obtainParameter(request, SPRING_SECURITY_RESTFUL_PHONE_KEY);
         credentials = obtainParameter(request, SPRING_SECURITY_RESTFUL_VERIFY_CODE_KEY);
-
         principal = principal.trim();
-        authRequest = new MobileTokenAuthenticationToken(principal, credentials);
-        setDetails(request, authRequest);
+        SmsCodeAuthenticationToken authRequest = new SmsCodeAuthenticationToken(principal, credentials);
+        this.setDetails(request, authRequest);
+        // 3. 返回 authenticated 方法的返回值
         return this.getAuthenticationManager().authenticate(authRequest);
     }
 
@@ -62,9 +56,8 @@ public class MobileTokenAuthenticationFilter extends AbstractAuthenticationProce
         return result == null ? "" : result;
     }
 
-    protected void setDetails(HttpServletRequest request,
-                              AbstractAuthenticationToken authRequest) {
-        authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
+    protected void setDetails(HttpServletRequest request, SmsCodeAuthenticationToken authRequest) {
+        authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
     }
 
     public void setPostOnly(boolean postOnly) {

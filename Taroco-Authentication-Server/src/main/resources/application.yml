@@ -42,6 +42,7 @@ taroco:
     url-permit-all:
       - /smsCode/*
       - /actuator/**
+      - /login/mobile
       - /oauth/mobile
       - /webjars/**
       - /static/**

@@ -2,6 +2,7 @@ package cn.taroco.oauth2.authentication.config;
 
 import cn.taroco.oauth2.authentication.filter.CustomUsernamePasswordAuthenticationFilter;
 import cn.taroco.oauth2.authentication.filter.MobileTokenAuthenticationFilter;
+import cn.taroco.oauth2.authentication.filter.SmsCodeAuthenticationFilter;
 import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
 import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
 import cn.taroco.oauth2.authentication.handler.MobileTokenLoginFailureHandler;
@@ -10,6 +11,7 @@ import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationFai
 import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationSuccessHandler;
 import cn.taroco.oauth2.authentication.handler.UsernamePasswordLogoutSuccessHandler;
 import cn.taroco.oauth2.authentication.provider.MobileTokenAuthenticationProvider;
+import cn.taroco.oauth2.authentication.provider.SmsCodeAuthenticationProvider;
 import cn.taroco.oauth2.authentication.redis.TarocoRedisRepository;
 import cn.taroco.oauth2.authentication.service.MobileUserDetailsService;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
@@ -76,6 +78,7 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry =
                 http
                         .addFilterAfter(mobileTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                        .addFilterAfter(smsCodeAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                         .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                         .formLogin().loginPage("/").permitAll()
                         .loginProcessingUrl("/login").permitAll()
@@ -96,8 +99,12 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
+                // 默认的用户名密码认证器
                 .authenticationProvider(daoAuthenticationProvider())
-                .authenticationProvider(mobileTokenAuthenticationProvider());
+                // 手机号获取token认证器
+                .authenticationProvider(mobileTokenAuthenticationProvider())
+                // 手机号验证码登录认证器
+                .authenticationProvider(smsCodeAuthenticationProvider());
     }
 
     @Override
@@ -154,7 +161,7 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * 手机号登录过滤器
+     * 手机号获取token过滤器
      */
     @Bean
     public MobileTokenAuthenticationFilter mobileTokenAuthenticationFilter() throws Exception {
@@ -166,11 +173,35 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * 手机号登录认证逻辑
+     * 手机号获取token认证逻辑
      */
     @Bean
     public MobileTokenAuthenticationProvider mobileTokenAuthenticationProvider() {
         final MobileTokenAuthenticationProvider provider = new MobileTokenAuthenticationProvider();
+        provider.setRedisRepository(redisRepository);
+        provider.setUserDetailsService(mobileUserDetailsService);
+        provider.setHideUserNotFoundExceptions(false);
+        return provider;
+    }
+
+    /**
+     * 手机号验证码登录filter
+     */
+    @Bean
+    public SmsCodeAuthenticationFilter smsCodeAuthenticationFilter() throws Exception {
+        final SmsCodeAuthenticationFilter filter = new SmsCodeAuthenticationFilter();
+        filter.setAuthenticationManager(authenticationManagerBean());
+        filter.setAuthenticationSuccessHandler(successHandler);
+        filter.setAuthenticationFailureHandler(failureHandler);
+        return filter;
+    }
+
+    /**
+     * 手机号验证码登录认证逻辑
+     */
+    @Bean
+    public SmsCodeAuthenticationProvider smsCodeAuthenticationProvider() {
+        final SmsCodeAuthenticationProvider provider = new SmsCodeAuthenticationProvider();
         provider.setRedisRepository(redisRepository);
         provider.setUserDetailsService(mobileUserDetailsService);
         provider.setHideUserNotFoundExceptions(false);

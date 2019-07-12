@@ -43,9 +43,14 @@ public interface SecurityConstants {
     String LICENSE = "made by taroco";
 
     /**
-     * 手机号登录路径
+     * 手机号获取token路径
      */
     String MOBILE_TOKEN_URL = "/oauth/mobile";
+
+    /**
+     * 手机号登录路径
+     */
+    String MOBILE_LOGIN_URL = "/login/mobile";
 
     /**
      * sys_oauth_client_details 表的字段，不包括client_id、client_secret
