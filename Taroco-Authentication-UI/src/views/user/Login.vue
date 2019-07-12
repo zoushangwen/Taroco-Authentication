@@ -52,7 +52,7 @@
           <a-row :gutter="16">
             <a-col class="gutter-row" :span="16">
               <a-form-item>
-                <a-input size="large" type="text" placeholder="验证码" v-decorator="['captcha', {rules: [{ required: true, message: '请输入验证码' }], validateTrigger: 'blur'}]">
+                <a-input size="large" type="text" placeholder="验证码" v-decorator="['code', {rules: [{ required: true, message: '请输入验证码' }], validateTrigger: 'blur'}]">
                   <a-icon slot="prefix" type="mail" :style="{ color: 'rgba(0,0,0,.25)' }"/>
                 </a-input>
               </a-form-item>
@@ -161,19 +161,24 @@ export default {
 
       state.loginBtn = true
 
-      const validateFieldsKey = customActiveKey === 'tab1' ? ['username', 'password'] : ['mobile', 'captcha']
+      const validateFieldsKey = customActiveKey === 'tab1' ? ['username', 'password'] : ['mobile', 'code']
 
       validateFields(validateFieldsKey, { force: true }, (err, values) => {
         if (!err) {
           const loginParams = { ...values }
-          delete loginParams.username
-          loginParams[!state.loginType ? 'email' : 'username'] = values.username
-          loginParams.password = values.password
-          Login(loginParams)
-            .then((res) => this.loginSuccess(res))
-            .finally(() => {
-              state.loginBtn = false
-            })
+          if (customActiveKey === 'tab1') {
+            Login(loginParams)
+              .then((res) => this.loginSuccess(res))
+              .finally(() => {
+                state.loginBtn = false
+              })
+          } else {
+            LoginByMobile(loginParams)
+              .then((res) => this.loginSuccess(res))
+              .finally(() => {
+                state.loginBtn = false
+              })
+          }
         } else {
           setTimeout(() => {
             state.loginBtn = false
@@ -199,12 +204,14 @@ export default {
 
           const hide = this.$message.loading('验证码发送中..', 0)
           smsCode(values.mobile).then(res => {
-            setTimeout(hide, 2500)
-            this.$notification['success']({
-              message: '提示',
-              description: '验证码获取成功，您的验证码为：' + res.result,
-              duration: 8
-            })
+            setTimeout(hide, 1)
+            if (res.status === 'SUCCEED') {
+              this.$notification['success']({
+                message: '提示',
+                description: '验证码获取成功，您的验证码为：' + res.result,
+                duration: 10
+              })
+            }
           }).catch(() => {
             setTimeout(hide, 1)
             clearInterval(interval)

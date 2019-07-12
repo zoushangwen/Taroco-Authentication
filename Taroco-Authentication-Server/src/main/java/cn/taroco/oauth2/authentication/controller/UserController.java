@@ -64,7 +64,7 @@ public class UserController {
         Object tempCode = redisRepository.get(CacheConstants.DEFAULT_CODE_KEY + mobile);
         if (tempCode != null) {
             log.error("用户:{}验证码未失效{}", mobile, tempCode);
-            return ResponseEntity.ok(Response.failure("验证码: " + tempCode + "未失效，请失效后再次申请"));
+            return ResponseEntity.ok(Response.failure("验证码: " + tempCode + " 未失效，请失效后再次申请"));
         }
         if (userService.findUserByMobile(mobile) == null) {
             log.error("根据用户手机号:{}, 查询用户为空", mobile);

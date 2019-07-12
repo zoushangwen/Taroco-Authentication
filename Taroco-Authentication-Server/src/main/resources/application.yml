@@ -32,7 +32,6 @@ spring:
     password: hyman
     database: 0
 
-
 taroco:
   oauth2:
     key-store:

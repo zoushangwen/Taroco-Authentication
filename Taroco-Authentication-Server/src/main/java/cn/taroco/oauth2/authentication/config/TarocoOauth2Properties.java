@@ -14,8 +14,8 @@ import java.util.List;
  * @author liuht
  * 2018/12/4 15:34
  */
-@ConfigurationProperties("taroco.oauth2")
 @Component
+@ConfigurationProperties("taroco.oauth2")
 @Data
 public class TarocoOauth2Properties {
 

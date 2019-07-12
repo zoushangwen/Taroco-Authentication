@@ -49,13 +49,10 @@ export function smsCode (mobile) {
  * @param {手机号} mobile
  * @param {验证码} code
  */
-export const loginByMobile = (mobile, code) => {
+export const loginByMobile = (params) => {
   return axios({
-    url: '/oauth/mobile',
-    headers: {
-      'Authorization': 'Basic dGFyb2NvOnRhcm9jbw=='
-    },
+    url: '/login/mobile',
     method: 'post',
-    params: { mobile, code }
+    params
   })
 }
