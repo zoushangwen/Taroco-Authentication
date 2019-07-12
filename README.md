@@ -20,6 +20,10 @@
 - 支持通过手机号和验证码获取 token
 - 集成了应用管理的功能，方便应用接入
 
+## Postman 接口调试
+
+前端界面已经集成到 Spring Boot，只需要启动一个后端服务即可。[postman_collection.json](docs/Taroco Authentication.postman_collection.json) 已导出，请自行导入到 Postman 进行接口调试。
+
 ## 扩展
 
 用户以及用户权限方面留给使用者自己去扩展，这里只是使用了一个 `MockUserService` 模拟了获取用户的过程，以及其他相关的角色、组织、接口权限都属于扩展的部分，统一认证只做认证做的事情。
