@@ -5,20 +5,27 @@ import cn.hutool.core.util.StrUtil;
 import cn.taroco.oauth2.authentication.core.Response;
 import cn.taroco.oauth2.authentication.entity.OauthClient;
 import cn.taroco.oauth2.authentication.service.client.OauthClientService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
+import org.springframework.security.oauth2.common.util.OAuth2Utils;
 import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.WhitelabelApprovalEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.WhitelabelErrorEndpoint;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.Map;
 
 /**
@@ -30,12 +37,38 @@ import java.util.Map;
  * @see WhitelabelErrorEndpoint
  * @see AuthorizationEndpoint
  */
+@Slf4j
 @Controller
 @SessionAttributes("authorizationRequest")
 public class AuthorizationController {
 
     @Autowired
     private OauthClientService oauthClientService;
+
+    @Autowired
+    private AuthorizationEndpoint authorizationEndpoint;
+
+    /**
+     * 自定义 确认/拒绝授权
+     *
+     * @param approvalParameters
+     * @param model
+     * @param sessionStatus
+     * @param principal
+     * @return
+     */
+    @RequestMapping(value = "/oauth/custom_authorize", method = RequestMethod.POST, params = OAuth2Utils.USER_OAUTH_APPROVAL)
+    public ResponseEntity<Response> approveOrDeny(@RequestParam Map<String, String> approvalParameters,
+                                                  Map<String, ?> model, SessionStatus sessionStatus, Principal principal) {
+        try{
+            final RedirectView redirectView = (RedirectView) authorizationEndpoint.approveOrDeny(
+                    approvalParameters, model, sessionStatus, principal);
+            return ResponseEntity.ok(Response.success(redirectView.getUrl()));
+        } catch (OAuth2Exception e) {
+            log.error("确认/拒绝授权失败", e);
+            return ResponseEntity.status(e.getHttpErrorCode()).body(Response.failure(e.getOAuth2ErrorCode(), e.getMessage()));
+        }
+    }
 
     /**
      * 授权页面 重写{@link WhitelabelApprovalEndpoint}

@@ -58,7 +58,7 @@ export function deleteClient (clientId) {
  */
 export function confirmAccess (data) {
   return axios({
-    url: '/oauth/authorize',
+    url: '/oauth/custom_authorize',
     method: 'post',
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     data: data

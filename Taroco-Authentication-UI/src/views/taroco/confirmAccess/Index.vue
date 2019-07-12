@@ -39,7 +39,9 @@ export default {
       this.scope.forEach(s => {
         params['scope.' + s] = value
       })
-      confirmAccess(qs.stringify(params))
+      confirmAccess(qs.stringify(params)).then(({ result }) => {
+        window.location.href = result
+      })
     }
   }
 }

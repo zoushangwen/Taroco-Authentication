@@ -2,7 +2,6 @@ package cn.taroco.oauth2.authentication.config;
 
 import cn.taroco.oauth2.authentication.consts.SecurityConstants;
 import cn.taroco.oauth2.authentication.exception.CustomWebResponseExceptionTranslator;
-import cn.taroco.oauth2.authentication.filter.CustomTokenPasswordAuthenticationFilter;
 import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
 import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
@@ -63,9 +62,6 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
 
     @Autowired
     private CustomAccessDeniedHandler accessDeniedHandler;
-
-    @Autowired
-    private CustomTokenPasswordAuthenticationFilter customTokenPasswordAuthenticationFilter;
 
     @Autowired
     private DataSource dataSource;
@@ -177,7 +173,6 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
                 //一般是针对password模式和client_credentials 主要是让/oauth/token支持client_id以及client_secret作登录认证
                 .allowFormAuthenticationForClients()
                 .authenticationEntryPoint(exceptionEntryPoint)
-                .accessDeniedHandler(accessDeniedHandler)
-                .addTokenEndpointAuthenticationFilter(customTokenPasswordAuthenticationFilter);
+                .accessDeniedHandler(accessDeniedHandler);
     }
 }

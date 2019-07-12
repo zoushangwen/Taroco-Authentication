@@ -14,9 +14,21 @@ const service = axios.create({
 const err = (error) => {
   if (error.response) {
     const data = error.response.data
+    if (error.response.status === 400) {
+      notification.error({
+        message: data.errorCode ? data.errorCode : '请求错误',
+        description: data.errorMessage
+      })
+    }
+    if (error.response.status === 500) {
+      notification.error({
+        message: data.errorCode ? data.errorCode : '请求错误',
+        description: data.errorMessage
+      })
+    }
     if (error.response.status === 403) {
       notification.error({
-        message: 'Forbidden',
+        message: '拒绝访问',
         description: data.errorMessage
       })
     }
@@ -41,10 +53,10 @@ service.interceptors.request.use(config => {
 
 // response interceptor
 service.interceptors.response.use((response) => {
-  const { status, errorMessage } = response.data
+  const { status, errorCode, errorMessage } = response.data
   if (status === 'FAILED') {
     notification.error({
-      message: '请求错误',
+      message: errorCode || '请求错误',
       description: errorMessage
     })
   }

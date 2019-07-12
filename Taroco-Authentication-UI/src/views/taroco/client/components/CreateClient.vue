@@ -52,8 +52,10 @@
             {rules: [{ required: true, message: '请选择授权范围' }]}
           ]">
           <a-select-option value="password">password</a-select-option>
-          <a-select-option value="refresh_token">refresh_token</a-select-option>
           <a-select-option value="authorization_code">authorization_code</a-select-option>
+          <a-select-option value="refresh_token">refresh_token</a-select-option>
+          <a-select-option value="client_credentials">client_credentials</a-select-option>
+          <a-select-option value="implicit">implicit</a-select-option>
         </a-select>
       </a-form-item>
 
