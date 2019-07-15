@@ -1,7 +1,8 @@
 # Taroco-Authentication 统一认证服务
 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/liuht777/Taroco-Authentication)
 [![Total lines](https://tokei.rs/b1/github/liuht777/Taroco-Authentication?category=lines)](https://github.com/liuht777/Taroco-Authentication)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fc4c61a52a8e4c7d9f68db2840b9b446)](https://app.codacy.com/app/liuht777/Taroco-Authentication?utm_source=github.com&utm_medium=referral&utm_content=liuht777/Taroco-Authentication&utm_campaign=Badge_Grade_Dashboard)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/liuht777/Taroco-Authentication)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?label=license)](https://github.com/liuht777/Taroco/blob/master/LICENSE)
 
 基于 Spring Security Oauth2 的统一认证服务，采用 [Ant Design Pro of Vue](https://pro.loacg.com/docs/getting-started "Ant Design Pro of Vue") 作为前端界面，重写了 Spring Security 登录模式，支持异步登录，所有接口以及授权端点都支持异步的方式。
