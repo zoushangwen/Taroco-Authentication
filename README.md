@@ -1,5 +1,6 @@
 # Taroco-Authentication 统一认证服务
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fc4c61a52a8e4c7d9f68db2840b9b446)](https://app.codacy.com/app/liuht777/Taroco-Authentication?utm_source=github.com&utm_medium=referral&utm_content=liuht777/Taroco-Authentication&utm_campaign=Badge_Grade_Dashboard)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/liuht777/Taroco-Authentication)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?label=license)](https://github.com/liuht777/Taroco/blob/master/LICENSE)
 
