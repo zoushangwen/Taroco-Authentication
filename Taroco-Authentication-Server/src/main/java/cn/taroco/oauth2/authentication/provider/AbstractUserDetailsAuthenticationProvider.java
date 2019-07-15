@@ -42,7 +42,6 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements Authe
     public final void afterPropertiesSet() throws Exception {
         Assert.notNull(this.userCache, "A user cache must be set");
         Assert.notNull(this.messages, "A message source must be set");
-        this.doAfterPropertiesSet();
     }
 
     @Override
@@ -122,10 +121,6 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements Authe
      * @throws AuthenticationException
      */
     protected abstract UserDetails retrieveUser(String principal, Authentication authentication) throws AuthenticationException;
-
-    protected void doAfterPropertiesSet() throws Exception {
-
-    }
 
     public UserCache getUserCache() {
         return this.userCache;
