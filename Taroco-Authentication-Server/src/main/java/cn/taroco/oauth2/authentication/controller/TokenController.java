@@ -1,13 +1,13 @@
 package cn.taroco.oauth2.authentication.controller;
 
-import cn.taroco.oauth2.authentication.core.Response;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author liuht
@@ -17,18 +17,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/oauth")
 public class TokenController {
 
-    @Autowired
-    private ConsumerTokenServices consumerTokenServices;
-
     /**
-     * 清除 accessToken
-     *
-     * @param accessToken accessToken
-     * @return true/false
+     * 退出
      */
-    @PostMapping("/removeToken")
-    @ResponseBody
-    public ResponseEntity<Response> removeToken(String accessToken) {
-        return ResponseEntity.ok(Response.success(consumerTokenServices.revokeToken(accessToken)));
+    @GetMapping("/exit")
+    public void removeToken(HttpServletRequest request, HttpServletResponse response) {
+        new SecurityContextLogoutHandler().logout(request, null, null);
+        try {
+            //sending back to client app
+            response.sendRedirect(request.getHeader("referer"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

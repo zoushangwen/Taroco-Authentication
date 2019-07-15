@@ -4,7 +4,7 @@
     :width="800"
     v-model="visible"
     @ok="handleOk"
-    @cancel="resetForm"
+    :destroyOnClose="true"
   >
     <a-form :form="form">
 
@@ -149,23 +149,24 @@ export default {
     init (clientId) {
       const that = this
       this.isAdd = true
+      this.resetForm()
+      this.visible = true
       if (clientId) {
         this.clientId = clientId
         this.isAdd = false
         getClient(clientId).then(res => {
           if (res.status === 'SUCCEED') {
-            that.form.setFieldsValue({
-              appName: res.result.appName,
-              authorizedGrantTypes: res.result.authorizedGrantTypes,
-              scope: res.result.scope,
-              webServerRedirectUri: res.result.webServerRedirectUri,
-              autoapprove: res.result.autoapprove
+            that.$nextTick(() => {
+              that.form.setFieldsValue({
+                appName: res.result.appName,
+                authorizedGrantTypes: res.result.authorizedGrantTypes,
+                scope: res.result.scope,
+                webServerRedirectUri: res.result.webServerRedirectUri,
+                autoapprove: res.result.autoapprove
+              })
             })
-            that.visible = true
           }
         })
-      } else {
-        this.visible = true
       }
     },
     handleOk () {

@@ -12,6 +12,9 @@
     <div class="col-sm-12">
         <h1>Secured Page</h1>
         Welcome, <span th:text="${#authentication.name}">Name</span>
+        <form th:action="@{/logout}" method="post" id="userform">
+            <a href="#" onclick="document.getElementById('userform').submit();">Logout</a>
+        </form>
     </div>
 </div>
 </body>

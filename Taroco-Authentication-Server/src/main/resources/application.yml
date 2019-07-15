@@ -43,6 +43,7 @@ taroco:
       - /actuator/**
       - /login/mobile
       - /oauth/mobile
+      - /oauth/exit
       - /webjars/**
       - /static/**
       - /**/*.css

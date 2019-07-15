@@ -36,11 +36,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.antMatcher("/**")
+        http
+                .logout()
+                .logoutSuccessUrl("http://localhost:8080/oauth/exit")
+                .and()
                 .authorizeRequests()
-                .antMatchers("/", "/login**")
-                .permitAll()
-                .anyRequest()
-                .authenticated();
+                .antMatchers("/").permitAll()
+                .anyRequest().authenticated();
     }
 }
