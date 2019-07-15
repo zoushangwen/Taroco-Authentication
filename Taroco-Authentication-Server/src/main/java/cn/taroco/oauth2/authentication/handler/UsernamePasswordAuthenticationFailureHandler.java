@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -19,6 +20,7 @@ import java.io.IOException;
  *
  * @author liuht
  * 2019/7/3 14:42
+ * @see SimpleUrlAuthenticationFailureHandler
  */
 @Component
 @Slf4j

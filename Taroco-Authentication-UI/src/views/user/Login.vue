@@ -109,7 +109,6 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { timeFix } from '@/utils/util'
 import { smsCode } from '@/api/user'
 export default {
   components: {},
@@ -221,9 +220,6 @@ export default {
         }
       })
     },
-    stepCaptchaSuccess () {
-      this.loginSuccess()
-    },
     stepCaptchaCancel () {
       this.Logout().then(() => {
         this.loginBtn = false
@@ -231,14 +227,12 @@ export default {
       })
     },
     loginSuccess (res) {
-      this.$router.push({ name: 'home' })
-      // 延迟 1 秒显示欢迎信息
-      setTimeout(() => {
-        this.$notification.success({
-          message: '欢迎',
-          description: `${timeFix()}，欢迎回来`
-        })
-      }, 1000)
+      const { result } = res
+      if (result) {
+        window.location.href = result
+      } else {
+        this.$router.push({ name: 'home' })
+      }
     }
   }
 }
