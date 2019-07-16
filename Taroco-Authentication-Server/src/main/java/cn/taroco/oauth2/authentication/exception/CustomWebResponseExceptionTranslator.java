@@ -26,7 +26,7 @@ import java.io.IOException;
  * 2019/5/6 10:45
  */
 @Component
-public class CustomWebResponseExceptionTranslator implements WebResponseExceptionTranslator {
+public class CustomWebResponseExceptionTranslator implements WebResponseExceptionTranslator<OAuth2Exception> {
 
     private ThrowableAnalyzer throwableAnalyzer = new DefaultThrowableAnalyzer();
 

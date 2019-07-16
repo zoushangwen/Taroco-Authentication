@@ -5,7 +5,6 @@ import cn.taroco.oauth2.authentication.exception.CustomWebResponseExceptionTrans
 import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
 import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
-import cn.taroco.oauth2.authentication.token.CustomerAccessTokenConverter;
 import cn.taroco.oauth2.authentication.vo.UserVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -27,12 +26,11 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
 import javax.sql.DataSource;
-import java.security.KeyPair;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -66,82 +64,15 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
     @Autowired
     private DataSource dataSource;
 
-    @Bean
-    public TokenStore tokenStore() {
-        return new JwtTokenStore(jwtAccessTokenConverter());
-    }
+    @Autowired
+    private TokenStore tokenStore;
 
-    /**
-     * JWT Token 生成转换器（加密方式以及加密的Token中存放哪些信息）
-     *
-     * @return
-     */
-    @Bean
-    public JwtAccessTokenConverter jwtAccessTokenConverter() {
-        final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        KeyPair keyPair = new KeyStoreKeyFactory
-                (oauth2Properties.getKeyStore().getLocation(), oauth2Properties.getKeyStore().getSecret().toCharArray())
-                .getKeyPair(oauth2Properties.getKeyStore().getAlias());
-        converter.setKeyPair(keyPair);
-        converter.setAccessTokenConverter(new CustomerAccessTokenConverter());
-        return converter;
-    }
-
-    /**
-     * jwt 生成token 定制化处理
-     * <p>
-     * 额外信息（这部分信息不关乎加密方式）, 添加到随token一起的additionalInformation当中
-     *
-     * @return TokenEnhancer
-     */
-    @Bean
-    public TokenEnhancer tokenEnhancer() {
-        return (accessToken, authentication) -> {
-            final Map<String, Object> additionalInfo = accessToken.getAdditionalInformation();
-            final Object principal = authentication.getUserAuthentication().getPrincipal();
-            UserVo user;
-            if (principal instanceof UserVo) {
-                user = (UserVo) principal;
-            } else {
-                final String username = (String) principal;
-                user = (UserVo) userNameUserDetailsService.loadUserByUsername(username);
-            }
-            additionalInfo.put(SecurityConstants.LICENSE_KEY, SecurityConstants.LICENSE);
-            additionalInfo.put(SecurityConstants.USER_NAME_HEADER, user.getUsername());
-            additionalInfo.put(SecurityConstants.USER_ID_HEADER, user.getUserId());
-            ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
-            return accessToken;
-        };
-    }
-
-    @Bean
-    @Lazy
-    @Scope(
-            proxyMode = ScopedProxyMode.INTERFACES
-    )
-    public ClientDetailsService clientDetailsService() {
-        return new JdbcClientDetailsService(dataSource);
-    }
+    @Autowired(required = false)
+    private JwtAccessTokenConverter jwtAccessTokenConverter;
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.withClientDetails(clientDetailsService());
-    }
-
-    @Bean
-    @Lazy
-    public DefaultTokenServices defaultTokenServices() {
-        DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-        defaultTokenServices.setSupportRefreshToken(true);
-        defaultTokenServices.setTokenStore(tokenStore());
-        defaultTokenServices.setAccessTokenValiditySeconds(oauth2Properties.getAccessTokenValiditySeconds());
-        defaultTokenServices.setRefreshTokenValiditySeconds(oauth2Properties.getRefreshTokenValiditySeconds());
-
-        TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-        tokenEnhancerChain.setTokenEnhancers(Arrays.asList(jwtAccessTokenConverter(), tokenEnhancer()));
-        defaultTokenServices.setTokenEnhancer(tokenEnhancerChain);
-
-        return defaultTokenServices;
     }
 
     /**
@@ -171,5 +102,62 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
                 .allowFormAuthenticationForClients()
                 .authenticationEntryPoint(exceptionEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler);
+    }
+
+    @Bean
+    @Lazy
+    @Scope(
+            proxyMode = ScopedProxyMode.INTERFACES
+    )
+    public ClientDetailsService clientDetailsService() {
+        return new JdbcClientDetailsService(dataSource);
+    }
+
+    /**
+     * jwt 生成token 定制化处理
+     * <p>
+     * 额外信息（这部分信息不关乎加密方式）, 添加到随token一起的additionalInformation当中
+     *
+     * @return TokenEnhancer
+     */
+    @Bean
+    public TokenEnhancer tokenEnhancer() {
+        return (accessToken, authentication) -> {
+            Map<String, Object> additionalInfo = new LinkedHashMap<>(accessToken.getAdditionalInformation());
+            final Object principal = authentication.getUserAuthentication().getPrincipal();
+            UserVo user;
+            if (principal instanceof UserVo) {
+                user = (UserVo) principal;
+            } else {
+                final String username = (String) principal;
+                user = (UserVo) userNameUserDetailsService.loadUserByUsername(username);
+            }
+            additionalInfo.put(SecurityConstants.LICENSE_KEY, SecurityConstants.LICENSE);
+            additionalInfo.put(SecurityConstants.USER_NAME_HEADER, user.getUsername());
+            additionalInfo.put(SecurityConstants.USER_ID_HEADER, user.getUserId());
+            ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
+            return accessToken;
+        };
+    }
+
+    @Bean
+    @Lazy
+    public DefaultTokenServices defaultTokenServices() {
+        DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+        defaultTokenServices.setSupportRefreshToken(true);
+        defaultTokenServices.setTokenStore(tokenStore);
+        defaultTokenServices.setAccessTokenValiditySeconds(oauth2Properties.getAccessTokenValiditySeconds());
+        defaultTokenServices.setRefreshTokenValiditySeconds(oauth2Properties.getRefreshTokenValiditySeconds());
+        defaultTokenServices.setClientDetailsService(clientDetailsService());
+
+        TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+        if (jwtAccessTokenConverter != null) {
+            tokenEnhancerChain.setTokenEnhancers(Arrays.asList(jwtAccessTokenConverter, tokenEnhancer()));
+        } else {
+            tokenEnhancerChain.setTokenEnhancers(Collections.singletonList(tokenEnhancer()));
+        }
+        defaultTokenServices.setTokenEnhancer(tokenEnhancerChain);
+
+        return defaultTokenServices;
     }
 }

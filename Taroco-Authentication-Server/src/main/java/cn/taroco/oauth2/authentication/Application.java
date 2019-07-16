@@ -1,5 +1,6 @@
 package cn.taroco.oauth2.authentication;
 
+import cn.taroco.oauth2.authentication.config.annotation.EnableJwtToken;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
  * @author liuht
  * 2019/7/2 16:11
  */
+@EnableJwtToken
 @SpringBootApplication
 public class Application {
 
