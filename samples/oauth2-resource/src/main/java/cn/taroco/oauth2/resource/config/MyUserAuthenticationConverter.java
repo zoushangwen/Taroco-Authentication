@@ -64,6 +64,8 @@ public class MyUserAuthenticationConverter implements UserAuthenticationConverte
             info.remove(AccessTokenConverter.ATI);
             info.remove(AccessTokenConverter.AUTHORITIES);
             info.remove(AccessTokenConverter.SCOPE);
+            info.remove(AccessTokenConverter.JTI);
+            info.remove(AccessTokenConverter.GRANT_TYPE);
             info.remove(USERNAME);
             authenticationToken.setDetails(info);
             return authenticationToken;
