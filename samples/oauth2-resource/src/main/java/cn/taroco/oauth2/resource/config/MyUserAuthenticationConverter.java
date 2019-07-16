@@ -6,10 +6,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -55,7 +57,15 @@ public class MyUserAuthenticationConverter implements UserAuthenticationConverte
                 principal = user;
             }
             final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(principal, "N/A", authorities);
-            authenticationToken.setDetails(map);
+            Map<String, Object> info = new HashMap<>(map);
+            info.remove(AccessTokenConverter.EXP);
+            info.remove(AccessTokenConverter.AUD);
+            info.remove(AccessTokenConverter.CLIENT_ID);
+            info.remove(AccessTokenConverter.ATI);
+            info.remove(AccessTokenConverter.AUTHORITIES);
+            info.remove(AccessTokenConverter.SCOPE);
+            info.remove(USERNAME);
+            authenticationToken.setDetails(info);
             return authenticationToken;
         }
         return null;
