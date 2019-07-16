@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,18 +49,6 @@ public class UserController {
             return null;
         }
         return ResponseEntity.ok(Response.success(authentication.getPrincipal()));
-    }
-
-    /**
-     * 查询登录用户
-     *
-     * @param authentication 信息
-     * @return 用户信息
-     */
-    @GetMapping("/user/info")
-    @ResponseBody
-    public Object userInfo(Authentication authentication) {
-        return authentication.getPrincipal();
     }
 
     /**
