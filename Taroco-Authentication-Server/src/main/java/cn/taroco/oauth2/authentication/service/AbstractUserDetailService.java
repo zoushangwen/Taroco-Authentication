@@ -1,6 +1,6 @@
 package cn.taroco.oauth2.authentication.service;
 
-import cn.taroco.oauth2.authentication.vo.UserVo;
+import cn.taroco.oauth2.authentication.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,10 +21,10 @@ public abstract class AbstractUserDetailService implements UserDetailsService {
     }
 
     /**
-     * 获取 UserVo 对象
+     * 获取 User 对象
      *
      * @param username 用户名
      * @return
      */
-    protected abstract UserVo getUserVO(String username);
+    protected abstract User getUserVO(String username);
 }

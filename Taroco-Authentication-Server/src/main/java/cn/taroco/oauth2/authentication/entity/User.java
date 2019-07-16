@@ -1,13 +1,18 @@
-package cn.taroco.oauth2.authentication.vo;
+package cn.taroco.oauth2.authentication.entity;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 用户Vo
@@ -16,7 +21,7 @@ import java.util.Date;
  * 2019/7/3 9:40
  */
 @Data
-public class UserVo implements Serializable, UserDetails {
+public class User implements Serializable, UserDetails {
 
     private static final long serialVersionUID = 8741046663436494432L;
 
@@ -65,9 +70,25 @@ public class UserVo implements Serializable, UserDetails {
      */
     private Date updateTime;
 
+    /**
+     * 角色列表
+     */
+    private List<Role> roles = new ArrayList<>();
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        if (CollUtil.isEmpty(roles)) {
+            return Collections.emptyList();
+        }
+        final List<GrantedAuthority> authorities = new ArrayList<>(AuthorityUtils.createAuthorityList(
+                roles.stream().map(Role::getAuthority).collect(Collectors.joining())));
+        roles.forEach(role -> {
+            if (CollUtil.isNotEmpty(role.getOperations())) {
+                authorities.addAll(AuthorityUtils.createAuthorityList(
+                        role.getOperations().stream().map(Operation::getAuthority).collect(Collectors.joining())));
+            }
+        });
+        return authorities;
     }
 
     @Override

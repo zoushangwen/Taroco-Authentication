@@ -1,10 +1,15 @@
 package cn.taroco.oauth2.authentication.service;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.taroco.oauth2.authentication.vo.UserVo;
+import cn.taroco.oauth2.authentication.consts.CommonConstants;
+import cn.taroco.oauth2.authentication.entity.Operation;
+import cn.taroco.oauth2.authentication.entity.Role;
+import cn.taroco.oauth2.authentication.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 
 /**
  * 模拟 UserService 实现查询用户
@@ -25,18 +30,19 @@ public class MockUserService {
      * @param username 用户名称,必须唯一
      * @return
      */
-    public UserVo findUserByUsername(String username) {
-        final UserVo userVo = new UserVo();
-        userVo.setUsername(username);
+    public User findUserByUsername(String username) {
+        final User user = new User();
+        user.setUsername(username);
         // 密码和用户名保持一致
-        userVo.setPassword(encoder.encode(username));
-        userVo.setEnabled(true);
-        userVo.setUserId(RandomUtil.randomInt());
-        userVo.setEnabled(true);
-        userVo.setExpired(false);
-        userVo.setLocked(false);
-        userVo.setPasswordExpired(false);
-        return userVo;
+        user.setPassword(encoder.encode(username));
+        user.setEnabled(true);
+        user.setUserId(RandomUtil.randomInt());
+        user.setEnabled(true);
+        user.setExpired(false);
+        user.setLocked(false);
+        user.setPasswordExpired(false);
+        user.setRoles(Collections.singletonList(defaultRole()));
+        return user;
     }
 
     /**
@@ -45,17 +51,23 @@ public class MockUserService {
      * @param mobile 手机号,必须唯一
      * @return
      */
-    public UserVo findUserByMobile(String mobile) {
-        final UserVo userVo = new UserVo();
-        userVo.setUsername(mobile);
+    public User findUserByMobile(String mobile) {
+        final User user = new User();
+        user.setUsername(mobile);
         // 密码和用户名保持一致
-        userVo.setPassword(encoder.encode(mobile));
-        userVo.setEnabled(true);
-        userVo.setUserId(RandomUtil.randomInt());
-        userVo.setEnabled(true);
-        userVo.setExpired(false);
-        userVo.setLocked(false);
-        userVo.setPasswordExpired(false);
-        return userVo;
+        user.setPassword(encoder.encode(mobile));
+        user.setEnabled(true);
+        user.setUserId(RandomUtil.randomInt());
+        user.setEnabled(true);
+        user.setExpired(false);
+        user.setLocked(false);
+        user.setPasswordExpired(false);
+        user.setRoles(Collections.singletonList(defaultRole()));
+        return user;
+    }
+
+    private Role defaultRole() {
+        return new Role(CommonConstants.ROLE_DEFAULT,
+                Collections.singletonList(new Operation(CommonConstants.OP_DEFAULT)));
     }
 }

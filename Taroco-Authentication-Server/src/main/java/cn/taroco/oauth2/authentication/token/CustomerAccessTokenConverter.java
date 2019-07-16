@@ -1,7 +1,7 @@
 package cn.taroco.oauth2.authentication.token;
 
 import cn.taroco.oauth2.authentication.consts.SecurityConstants;
-import cn.taroco.oauth2.authentication.vo.UserVo;
+import cn.taroco.oauth2.authentication.entity.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
@@ -36,8 +36,8 @@ public class CustomerAccessTokenConverter extends DefaultAccessTokenConverter {
             if (authentication.getAuthorities() != null && !authentication.getAuthorities().isEmpty()) {
                 response.put(AUTHORITIES, AuthorityUtils.authorityListToSet(authentication.getAuthorities()));
             }
-            if (authentication.getPrincipal() instanceof UserVo) {
-                final UserVo user = (UserVo) authentication.getPrincipal();
+            if (authentication.getPrincipal() instanceof User) {
+                final User user = (User) authentication.getPrincipal();
                 response.put(SecurityConstants.USER_ID_HEADER, user.getUserId());
             }
             return response;

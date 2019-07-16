@@ -30,6 +30,13 @@
 用户以及用户权限方面留给使用者自己去扩展，这里只是使用了一个 `MockUserService` 模拟了获取用户的过程，以及其他相关的角色、组织、接口权限都属于扩展的部分，统一认证只做认证做的事情。
 
 ```java
+/**
+ * 模拟 UserService 实现查询用户
+ * 在实际使用上需要替换
+ *
+ * @author liuht
+ * 2019/7/3 9:52
+ */
 @Service
 public class MockUserService {
 
@@ -42,18 +49,19 @@ public class MockUserService {
      * @param username 用户名称,必须唯一
      * @return
      */
-    public UserVo findUserByUsername(String username) {
-        final UserVo userVo = new UserVo();
-        userVo.setUsername(username);
+    public User findUserByUsername(String username) {
+        final User user = new User();
+        user.setUsername(username);
         // 密码和用户名保持一致
-        userVo.setPassword(encoder.encode(username));
-        userVo.setEnabled(true);
-        userVo.setUserId(RandomUtil.randomInt());
-        userVo.setEnabled(true);
-        userVo.setExpired(false);
-        userVo.setLocked(false);
-        userVo.setPasswordExpired(false);
-        return userVo;
+        user.setPassword(encoder.encode(username));
+        user.setEnabled(true);
+        user.setUserId(RandomUtil.randomInt());
+        user.setEnabled(true);
+        user.setExpired(false);
+        user.setLocked(false);
+        user.setPasswordExpired(false);
+        user.setRoles(Collections.singletonList(defaultRole()));
+        return user;
     }
 
     /**
@@ -62,18 +70,24 @@ public class MockUserService {
      * @param mobile 手机号,必须唯一
      * @return
      */
-    public UserVo findUserByMobile(String mobile) {
-        final UserVo userVo = new UserVo();
-        userVo.setUsername(mobile);
+    public User findUserByMobile(String mobile) {
+        final User user = new User();
+        user.setUsername(mobile);
         // 密码和用户名保持一致
-        userVo.setPassword(encoder.encode(mobile));
-        userVo.setEnabled(true);
-        userVo.setUserId(RandomUtil.randomInt());
-        userVo.setEnabled(true);
-        userVo.setExpired(false);
-        userVo.setLocked(false);
-        userVo.setPasswordExpired(false);
-        return userVo;
+        user.setPassword(encoder.encode(mobile));
+        user.setEnabled(true);
+        user.setUserId(RandomUtil.randomInt());
+        user.setEnabled(true);
+        user.setExpired(false);
+        user.setLocked(false);
+        user.setPasswordExpired(false);
+        user.setRoles(Collections.singletonList(defaultRole()));
+        return user;
+    }
+
+    private Role defaultRole() {
+        return new Role(CommonConstants.ROLE_DEFAULT,
+                Collections.singletonList(new Operation(CommonConstants.OP_DEFAULT)));
     }
 }
 ```

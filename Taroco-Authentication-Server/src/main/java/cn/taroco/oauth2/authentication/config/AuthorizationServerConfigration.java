@@ -5,7 +5,7 @@ import cn.taroco.oauth2.authentication.exception.CustomWebResponseExceptionTrans
 import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
 import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
-import cn.taroco.oauth2.authentication.vo.UserVo;
+import cn.taroco.oauth2.authentication.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -125,12 +125,12 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
         return (accessToken, authentication) -> {
             Map<String, Object> additionalInfo = new LinkedHashMap<>(accessToken.getAdditionalInformation());
             final Object principal = authentication.getUserAuthentication().getPrincipal();
-            UserVo user;
-            if (principal instanceof UserVo) {
-                user = (UserVo) principal;
+            User user;
+            if (principal instanceof User) {
+                user = (User) principal;
             } else {
                 final String username = (String) principal;
-                user = (UserVo) userNameUserDetailsService.loadUserByUsername(username);
+                user = (User) userNameUserDetailsService.loadUserByUsername(username);
             }
             additionalInfo.put(SecurityConstants.LICENSE_KEY, SecurityConstants.LICENSE);
             additionalInfo.put(SecurityConstants.USER_NAME_HEADER, user.getUsername());
