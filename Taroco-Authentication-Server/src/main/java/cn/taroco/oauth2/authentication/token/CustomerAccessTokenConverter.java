@@ -31,10 +31,10 @@ public class CustomerAccessTokenConverter extends DefaultAccessTokenConverter {
         public Map<String, ?> convertUserAuthentication(Authentication authentication) {
             final Map<String, Object> response = new LinkedHashMap<>();
             response.put(USERNAME, authentication.getName());
+            response.put(SecurityConstants.LICENSE_KEY, SecurityConstants.LICENSE);
             response.put(SecurityConstants.USER_NAME_HEADER, authentication.getName());
             if (authentication.getAuthorities() != null && !authentication.getAuthorities().isEmpty()) {
                 response.put(AUTHORITIES, AuthorityUtils.authorityListToSet(authentication.getAuthorities()));
-                response.put(SecurityConstants.USER_ROLE_HEADER, AuthorityUtils.authorityListToSet(authentication.getAuthorities()));
             }
             if (authentication.getPrincipal() instanceof UserVo) {
                 final UserVo user = (UserVo) authentication.getPrincipal();

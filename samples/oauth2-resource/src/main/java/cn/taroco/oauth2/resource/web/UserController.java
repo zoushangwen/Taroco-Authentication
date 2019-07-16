@@ -19,6 +19,6 @@ public class UserController {
     @PreAuthorize("#oauth2.hasScope('All')")
     @GetMapping
     public Object user(OAuth2Authentication authentication) {
-        return authentication.getPrincipal();
+        return authentication.getUserAuthentication();
     }
 }

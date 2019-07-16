@@ -28,11 +28,6 @@ public interface SecurityConstants {
     String USER_ID_HEADER = "x-user-id";
 
     /**
-     * 角色信息头
-     */
-    String USER_ROLE_HEADER = "x-user-role";
-
-    /**
      * license key
      */
     String LICENSE_KEY = "license";
