@@ -1,17 +1,19 @@
 package cn.taroco.oauth2.authentication.config;
 
+import cn.taroco.oauth2.authentication.code.RedisAuthenticationCodeServices;
 import cn.taroco.oauth2.authentication.consts.SecurityConstants;
+import cn.taroco.oauth2.authentication.entity.User;
 import cn.taroco.oauth2.authentication.exception.CustomWebResponseExceptionTranslator;
 import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
 import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
-import cn.taroco.oauth2.authentication.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -50,6 +52,9 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
     private TarocoOauth2Properties oauth2Properties;
 
     @Autowired
+    private RedisConnectionFactory redisConnectionFactory;
+
+    @Autowired
     private UserNameUserDetailsServiceImpl userNameUserDetailsService;
 
     @Autowired
@@ -84,7 +89,8 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
                 .authenticationManager(authenticationManager)
                 .userDetailsService(userNameUserDetailsService)
                 .tokenServices(defaultTokenServices())
-                .exceptionTranslator(exceptionTranslator);
+                .exceptionTranslator(exceptionTranslator)
+                .authorizationCodeServices(redisAuthenticationCodeServices());
     }
 
     /**
@@ -104,13 +110,22 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
                 .accessDeniedHandler(accessDeniedHandler);
     }
 
+    /**
+     * 客户端管理
+     */
     @Bean
     @Lazy
-    @Scope(
-            proxyMode = ScopedProxyMode.INTERFACES
-    )
+    @Scope(proxyMode = ScopedProxyMode.INTERFACES)
     public ClientDetailsService clientDetailsService() {
         return new JdbcClientDetailsService(dataSource);
+    }
+
+    /**
+     * 自定义AuthorizationCodeServices实现类来将auth_code 存放在redis中
+     */
+    @Bean
+    public RedisAuthenticationCodeServices redisAuthenticationCodeServices() {
+        return new RedisAuthenticationCodeServices(redisConnectionFactory);
     }
 
     /**
