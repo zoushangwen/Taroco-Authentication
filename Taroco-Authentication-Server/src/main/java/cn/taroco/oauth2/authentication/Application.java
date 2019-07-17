@@ -1,6 +1,7 @@
 package cn.taroco.oauth2.authentication;
 
 import cn.taroco.oauth2.authentication.config.annotation.EnableJwtToken;
+import cn.taroco.oauth2.authentication.consts.CacheConstants;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,6 +10,7 @@ import org.springframework.boot.web.server.ErrorPage;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
  * 启动类
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
  * 2019/7/2 16:11
  */
 @EnableJwtToken
+@EnableRedisHttpSession(redisNamespace = CacheConstants.REDIS_SESSION_PREFIX)
 @SpringBootApplication
 public class Application {
 

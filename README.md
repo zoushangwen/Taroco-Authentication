@@ -13,13 +13,16 @@
 
 ## 支持特性
 
-- 异步JSON登录的支持
-- 手机号验证码登录
-- SSO 支持
-- 基于 JWT 的 Token 策略
-- 支持 OAuth2 定义的四种授权码模式以及刷新 token
-- 支持通过手机号和验证码获取 token
+- 支持异步 JSON 登录
+- 支持手机号、验证码登录
+- 支持 SSO
+- 支持 JWT Token
+- 支持 Redis Token
+- 支持集群部署（已集成 Spring Session）
+- 支持 OAuth2.0 定义的四种授权码模式以及刷新 token
+- 支持通过手机号和验证码获取 token（类似 password模式）
 - 集成了应用管理的功能，方便应用接入
+- 完整的 Demo 示例，包括 SSO、Resource Server，以及在 Resource Server 中解析token，获取用户的权限以及认证中添加的额外信息
 
 ## Postman 接口调试
 

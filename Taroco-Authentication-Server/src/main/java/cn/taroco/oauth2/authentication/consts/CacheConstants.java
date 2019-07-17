@@ -19,6 +19,11 @@ public interface CacheConstants {
     String PREFIX = "taroco" + SPLIT;
 
     /**
+     * Redis session 缓存前缀
+     */
+    String REDIS_SESSION_PREFIX = PREFIX + "session";
+
+    /**
      * Redis token 缓存前缀
      */
     String REDIS_TOKEN_PREFIX = PREFIX + "token" + SPLIT;
