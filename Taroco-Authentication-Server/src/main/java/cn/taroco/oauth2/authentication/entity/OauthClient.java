@@ -34,9 +34,9 @@ public class OauthClient {
 
     private String authorities;
 
-    private int accessTokenValidity;
+    private Integer accessTokenValidity;
 
-    private int refreshTokenValidity;
+    private Integer refreshTokenValidity;
 
     private String additionalInformation;
 
