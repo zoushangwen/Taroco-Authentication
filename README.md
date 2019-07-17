@@ -60,11 +60,11 @@
 
 Spring 针对 servlet 默认有一个过滤器链（Filter chain），Spring Security 本质上也是一个连续的 Filter 链，然后又以 FilterChainProxy 的形式被添加到 Servlet 容器的 Filter chain 当中。下图展示了 springSecurityFilterChain 是如何嵌入Servlet 容器的 Filter chain 当中:
 
-![Spring Security Filters](docs/imgs/Spring Security Filters.png "Spring Security Filters")
+![SpringSecurityFilters](docs/imgs/SpringSecurityFilters.png "SpringSecurityFilters")
 
 我们以 Spring Security 用户名/密码登录为例展示认证的整体流程如下:
 
-![Spring Security Authentication Process](docs/imgs/Spring Security Authentication Process.png "Spring Security Authentication Process")
+![SpringSecurityAuthenticationProcess.png](docs/imgs/SpringSecurityAuthenticationProcess.png "SpringSecurityAuthenticationProcess.png")
 
 ## Spring Security OAuth2 授权码模式流程
 
