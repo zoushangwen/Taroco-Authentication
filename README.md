@@ -568,6 +568,7 @@ public class SmsCodeAuthenticationFilter extends AbstractAuthenticationProcessin
 ```
 
 > 在这里通过获取参数生成我们自定义的 SmsCodeAuthenticationToken，交给 AuthenticationManager 进行认证。
+> 同时我们自定义的这个 url 需要添加到 Spring Security 放行的队列当中。
 
 最后，需要将我们自定义的内容加入到 Spring Security 的配置当中:
 
@@ -617,6 +618,12 @@ public SmsCodeAuthenticationProvider smsCodeAuthenticationProvider() {
 ## Spring Security OAuth2 SSO 流程
 
 ## Spring Security OAuth2 自定义开发
+
+## Spring Security 用户权限管理方案
+
+### Scope & Authority
+
+### 用户权限方案
 
 ## 扩展
 
