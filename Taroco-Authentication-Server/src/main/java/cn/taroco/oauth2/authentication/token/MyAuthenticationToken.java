@@ -6,7 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 
 /**
- * 自定义AbstractAuthenticationToken，
+ * 自定义AbstractAuthenticationToken
  *
  * @author liuht
  * 2019/5/13 15:25

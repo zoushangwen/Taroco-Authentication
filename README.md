@@ -137,9 +137,7 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry =
-                http
-                        .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
     
     /**
@@ -161,7 +159,458 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
 
 ### 自定义手机号/验证码登录
 
+同样的在用户名/密码登录流程中，我们可以发现最重要的几个地方也是我们自己实现别的登录方式需要重写的地方主要有三点：
 
+1. UsernamePasswordAuthenticationFilter 认证的发起，读取认证参数，生成未认证的 AuthenticationToken，调用 AuthenticationManager 的认证方法。
+2. AuthenticationProvider 认证器。AuthenticationManager 最终会调用 AuthenticationToken 对应的认证器进行用户认证。
+3. AuthenticationToken 用户认证信息，保存认证过后的用户信息以及权限信息。UsernamePasswordAuthenticationToken 就是用户名/密码登录的一个实现。
+
+我们分三步来实现自定义的手机号/验证码登录：
+
+1. 第一步，自定义 SmsCodeAuthenticationToken
+
+在这之前我先实现了一个 MyAuthenticationToken 类, 方便实现其他的登录方式, SmsCodeAuthenticationToken 只需要继承它即可：
+
+```java
+/**
+ * 自定义AbstractAuthenticationToken
+ *
+ * @author liuht
+ * 2019/5/13 15:25
+ */
+public class MyAuthenticationToken extends AbstractAuthenticationToken {
+
+    private static final long serialVersionUID = 7129356369074220969L;
+    protected final Object principal;
+    protected Object credentials;
+
+    public MyAuthenticationToken(Object principal, Object credentials) {
+        super(null);
+        this.principal = principal;
+        this.credentials = credentials;
+        this.setAuthenticated(false);
+    }
+
+    public MyAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+        super(authorities);
+        this.principal = principal;
+        this.credentials = credentials;
+        super.setAuthenticated(true);
+    }
+
+
+    @Override
+    public Object getCredentials() {
+        return this.credentials;
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return this.principal;
+    }
+
+    @Override
+    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+        if (isAuthenticated) {
+            throw new IllegalArgumentException("Cannot set this token to trusted - use constructor which takes a GrantedAuthority list instead");
+        } else {
+            super.setAuthenticated(false);
+        }
+    }
+
+    @Override
+    public void eraseCredentials() {
+        super.eraseCredentials();
+        this.credentials = null;
+    }
+}
+
+/**
+ * 定义验证码登录系统
+ *
+ * @author liuht
+ * 2019/7/12 14:04
+ */
+public class SmsCodeAuthenticationToken extends MyAuthenticationToken {
+
+    private static final long serialVersionUID = 6056078576992222156L;
+
+    public SmsCodeAuthenticationToken(final Object principal, final Object credentials) {
+        super(principal, credentials);
+    }
+
+    public SmsCodeAuthenticationToken(final Object principal, final Object credentials, final Collection<? extends GrantedAuthority> authorities) {
+        super(principal, credentials, authorities);
+    }
+}
+```
+
+2. 第二步，自定义 SmsCodeAuthenticationProvider
+
+同样的，我先抽象了一个 AbstractUserDetailsAuthenticationProvider 类，将 createSuccessAuthentication、additionalAuthenticationChecks、retrieveUser 三个方法交由 SmsCodeAuthenticationProvider 去实现。
+这样同样方便实现其他的登录方式。
+
+```java
+/**
+ * 自定义 AuthenticationProvider， 以使用自定义的 MyAuthenticationToken
+ *
+ * @author liuht
+ * 2019/5/13 15:25
+ */
+@Slf4j
+public abstract class AbstractUserDetailsAuthenticationProvider implements AuthenticationProvider, InitializingBean, MessageSourceAware {
+
+    protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
+    private UserCache userCache = new NullUserCache();
+    private boolean forcePrincipalAsString = false;
+    protected boolean hideUserNotFoundExceptions = true;
+    private UserDetailsChecker preAuthenticationChecks = new AbstractUserDetailsAuthenticationProvider.DefaultPreAuthenticationChecks();
+    private UserDetailsChecker postAuthenticationChecks = new AbstractUserDetailsAuthenticationProvider.DefaultPostAuthenticationChecks();
+
+    @Override
+    public final void afterPropertiesSet() throws Exception {
+        Assert.notNull(this.userCache, "A user cache must be set");
+        Assert.notNull(this.messages, "A message source must be set");
+    }
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String username = authentication.getPrincipal() == null ? "NONE_PROVIDED" : authentication.getName();
+        boolean cacheWasUsed = true;
+        UserDetails user = this.userCache.getUserFromCache(username);
+        if (user == null) {
+            cacheWasUsed = false;
+
+            try {
+                user = this.retrieveUser(username, authentication);
+            } catch (UsernameNotFoundException var6) {
+                log.error("User \'" + username + "\' not found");
+                if (this.hideUserNotFoundExceptions) {
+                    throw new BadCredentialsException(this.messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+                }
+
+                throw var6;
+            }
+
+            Assert.notNull(user, "retrieveUser returned null - a violation of the interface contract");
+        }
+
+        try {
+            this.preAuthenticationChecks.check(user);
+            this.additionalAuthenticationChecks(user, authentication);
+        } catch (AuthenticationException var7) {
+            if (!cacheWasUsed) {
+                throw var7;
+            }
+
+            cacheWasUsed = false;
+            user = this.retrieveUser(username, authentication);
+            this.preAuthenticationChecks.check(user);
+            this.additionalAuthenticationChecks(user, authentication);
+        }
+
+        this.postAuthenticationChecks.check(user);
+        if (!cacheWasUsed) {
+            this.userCache.putUserInCache(user);
+        }
+
+        Object principalToReturn = user;
+        if (this.forcePrincipalAsString) {
+            principalToReturn = user.getUsername();
+        }
+
+        return this.createSuccessAuthentication(principalToReturn, authentication, user);
+    }
+
+    /**
+     * 创建自定义的 Authentication 实现
+     *
+     * @param principal
+     * @param authentication
+     * @param user
+     * @return
+     */
+    protected abstract Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user);
+
+    /**
+     * 校验 authentication 有效性
+     *
+     * @param userDetails
+     * @param authentication
+     */
+    protected abstract void additionalAuthenticationChecks(UserDetails userDetails, Authentication authentication) throws AuthenticationException;
+
+    /**
+     * 获取 UserDetails 详情
+     *
+     * @param principal
+     * @param authentication
+     * @return
+     */
+    protected abstract UserDetails retrieveUser(String principal, Authentication authentication) throws AuthenticationException;
+
+    public UserCache getUserCache() {
+        return this.userCache;
+    }
+
+    public boolean isForcePrincipalAsString() {
+        return this.forcePrincipalAsString;
+    }
+
+    public boolean isHideUserNotFoundExceptions() {
+        return this.hideUserNotFoundExceptions;
+    }
+
+    public void setForcePrincipalAsString(boolean forcePrincipalAsString) {
+        this.forcePrincipalAsString = forcePrincipalAsString;
+    }
+
+    public void setHideUserNotFoundExceptions(boolean hideUserNotFoundExceptions) {
+        this.hideUserNotFoundExceptions = hideUserNotFoundExceptions;
+    }
+
+    @Override
+    public void setMessageSource(MessageSource messageSource) {
+        this.messages = new MessageSourceAccessor(messageSource);
+    }
+
+    public void setUserCache(UserCache userCache) {
+        this.userCache = userCache;
+    }
+
+    protected UserDetailsChecker getPreAuthenticationChecks() {
+        return this.preAuthenticationChecks;
+    }
+
+    public void setPreAuthenticationChecks(UserDetailsChecker preAuthenticationChecks) {
+        this.preAuthenticationChecks = preAuthenticationChecks;
+    }
+
+    protected UserDetailsChecker getPostAuthenticationChecks() {
+        return this.postAuthenticationChecks;
+    }
+
+    public void setPostAuthenticationChecks(UserDetailsChecker postAuthenticationChecks) {
+        this.postAuthenticationChecks = postAuthenticationChecks;
+    }
+
+    private class DefaultPostAuthenticationChecks implements UserDetailsChecker {
+        private DefaultPostAuthenticationChecks() {
+        }
+
+        @Override
+        public void check(UserDetails user) {
+            if (!user.isCredentialsNonExpired()) {
+                log.debug("User account credentials have expired");
+                throw new CredentialsExpiredException(AbstractUserDetailsAuthenticationProvider.this.messages.getMessage("AbstractUserDetailsAuthenticationProvider.credentialsExpired", "User credentials have expired"));
+            }
+        }
+    }
+
+    private class DefaultPreAuthenticationChecks implements UserDetailsChecker {
+        private DefaultPreAuthenticationChecks() {
+        }
+
+        @Override
+        public void check(UserDetails user) {
+            if (!user.isAccountNonLocked()) {
+                log.debug("User account is locked");
+                throw new LockedException(AbstractUserDetailsAuthenticationProvider.this.messages.getMessage("AbstractUserDetailsAuthenticationProvider.locked", "User account is locked"));
+            } else if (!user.isEnabled()) {
+                log.debug("User account is disabled");
+                throw new DisabledException(AbstractUserDetailsAuthenticationProvider.this.messages.getMessage("AbstractUserDetailsAuthenticationProvider.disabled", "User is disabled"));
+            } else if (!user.isAccountNonExpired()) {
+                log.debug("User account is expired");
+                throw new AccountExpiredException(AbstractUserDetailsAuthenticationProvider.this.messages.getMessage("AbstractUserDetailsAuthenticationProvider.expired", "User account has expired"));
+            }
+        }
+    }
+}
+
+/**
+ * 手机验证码登录系统 Provider
+ *
+ * @author liuht
+ * 2019/7/12 14:35
+ */
+@Slf4j
+public class SmsCodeAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+
+    private UserDetailsService userDetailsService;
+
+    private TarocoRedisRepository redisRepository;
+
+    @Override
+    protected Authentication createSuccessAuthentication(final Object principal, final Authentication authentication, final UserDetails user) {
+        final SmsCodeAuthenticationToken token = new SmsCodeAuthenticationToken(principal, authentication.getCredentials(), user.getAuthorities());
+        token.setDetails(authentication.getDetails());
+        return token;
+    }
+
+    @Override
+    protected void additionalAuthenticationChecks(final UserDetails userDetails, final Authentication authentication) throws AuthenticationException {
+        if (authentication.getCredentials() == null) {
+            log.error("Authentication failed: no credentials provided");
+            throw new BadCredentialsException(this.messages.getMessage("MobileAuthenticationProvider.badCredentials", "Bad credentials"));
+        } else {
+            final String presentedPassword = authentication.getCredentials().toString();
+            final Object principal = authentication.getPrincipal();
+            final String key = CacheConstants.DEFAULT_CODE_KEY + principal;
+            final String code = redisRepository.get(key);
+            // 校验验证码
+            if (StrUtil.isEmpty(code) || !code.equals(presentedPassword)) {
+                log.error("Authentication failed: verifyCode does not match stored value");
+                throw new BadCredentialsException(this.messages.getMessage("MobileAuthenticationProvider.badCredentials", "Bad verifyCode"));
+            }
+            // 校验成功删除验证码(验证码只能使用一次)
+            redisRepository.del(key);
+        }
+    }
+
+    @Override
+    protected UserDetails retrieveUser(final String mobile, final Authentication authentication) throws AuthenticationException {
+        UserDetails loadedUser;
+        try {
+            loadedUser = userDetailsService.loadUserByUsername(mobile);
+        } catch (UsernameNotFoundException var6) {
+            throw var6;
+        } catch (Exception var7) {
+            throw new InternalAuthenticationServiceException(var7.getMessage(), var7);
+        }
+        if (loadedUser == null) {
+            throw new InternalAuthenticationServiceException("UserDetailsService returned null, which is an interface contract violation");
+        } else {
+            return loadedUser;
+        }
+    }
+
+    @Override
+    public boolean supports(final Class<?> authentication) {
+        return SmsCodeAuthenticationToken.class.isAssignableFrom(authentication);
+    }
+
+    public UserDetailsService getUserDetailsService() {
+        return userDetailsService;
+    }
+
+    public void setUserDetailsService(final UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    public TarocoRedisRepository getRedisRepository() {
+        return redisRepository;
+    }
+
+    public void setRedisRepository(final TarocoRedisRepository redisRepository) {
+        this.redisRepository = redisRepository;
+    }
+}
+```
+
+> 在 SmsCodeAuthenticationProvider 类中有个 supports 方法，该方法决定了 AuthenticationManager 该调用哪个 AuthenticationProvider 的认证方法。
+通过判断 authentication 是否是我们自定义的 SmsCodeAuthenticationToken 实现类。
+
+3. 第三步，自定义 SmsCodeAuthenticationFilter
+
+```java
+/**
+ * 自定义手机号验证码登录系统
+ *
+ * @author liuht
+ * 2019/7/12 14:13
+ */
+public class SmsCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+
+    private static final String SPRING_SECURITY_RESTFUL_PHONE_KEY = "mobile";
+    private static final String SPRING_SECURITY_RESTFUL_VERIFY_CODE_KEY = "code";
+
+    private boolean postOnly = true;
+
+    public SmsCodeAuthenticationFilter() {
+        super(new AntPathRequestMatcher(SecurityConstants.MOBILE_LOGIN_URL, HttpMethod.POST.name()));
+    }
+
+    @Override
+    public Authentication attemptAuthentication(final HttpServletRequest request, final HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+        if (postOnly && !request.getMethod().equals(HttpMethod.POST.name())) {
+            throw new AuthenticationServiceException(
+                    "Authentication method not supported: " + request.getMethod());
+        }
+        String principal;
+        String credentials;
+        // 1. 从请求中获取参数 mobile + smsCode
+        principal = obtainParameter(request, SPRING_SECURITY_RESTFUL_PHONE_KEY);
+        credentials = obtainParameter(request, SPRING_SECURITY_RESTFUL_VERIFY_CODE_KEY);
+        principal = principal.trim();
+        SmsCodeAuthenticationToken authRequest = new SmsCodeAuthenticationToken(principal, credentials);
+        this.setDetails(request, authRequest);
+        // 3. 返回 authenticated 方法的返回值
+        return this.getAuthenticationManager().authenticate(authRequest);
+    }
+
+    private String obtainParameter(HttpServletRequest request, String parameter) {
+        String result =  request.getParameter(parameter);
+        return result == null ? "" : result;
+    }
+
+    protected void setDetails(HttpServletRequest request, SmsCodeAuthenticationToken authRequest) {
+        authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
+    }
+
+    public void setPostOnly(boolean postOnly) {
+        this.postOnly = postOnly;
+    }
+
+    public boolean isPostOnly() {
+        return postOnly;
+    }
+}
+```
+
+> 在这里通过获取参数生成我们自定义的 SmsCodeAuthenticationToken，交给 AuthenticationManager 进行认证。
+
+最后，需要将我们自定义的内容加入到 Spring Security 的配置当中:
+
+```
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+    http.addFilterAfter(smsCodeAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+}
+
+@Override
+protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth
+            // 加入自定义的认证器之前需要先添加默认的用户名密码认证器
+            .authenticationProvider(daoAuthenticationProvider())
+            // 手机号验证码登录认证器
+            .authenticationProvider(smsCodeAuthenticationProvider());
+}
+
+/**
+ * 手机号验证码登录filter
+ */
+@Bean
+public SmsCodeAuthenticationFilter smsCodeAuthenticationFilter() throws Exception {
+    final SmsCodeAuthenticationFilter filter = new SmsCodeAuthenticationFilter();
+    filter.setAuthenticationManager(authenticationManagerBean());
+    filter.setAuthenticationSuccessHandler(successHandler);
+    filter.setAuthenticationFailureHandler(failureHandler);
+    return filter;
+}
+
+/**
+ * 手机号验证码登录认证逻辑
+ */
+@Bean
+public SmsCodeAuthenticationProvider smsCodeAuthenticationProvider() {
+    final SmsCodeAuthenticationProvider provider = new SmsCodeAuthenticationProvider();
+    provider.setRedisRepository(redisRepository);
+    provider.setUserDetailsService(mobileUserDetailsService);
+    provider.setHideUserNotFoundExceptions(false);
+    return provider;
+}
+
+```
 
 ## Spring Security OAuth2 授权码模式流程
 
