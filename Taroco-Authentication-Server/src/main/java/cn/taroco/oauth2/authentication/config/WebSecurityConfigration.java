@@ -16,6 +16,8 @@ import cn.taroco.oauth2.authentication.redis.TarocoRedisRepository;
 import cn.taroco.oauth2.authentication.service.MobileUserDetailsService;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -36,6 +38,8 @@ import java.util.List;
  *
  * @author liuht
  * @date 2018/7/24 15:58
+ * @see SecurityFilterAutoConfiguration
+ * @see SpringBootWebSecurityConfiguration
  */
 @EnableWebSecurity
 public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
