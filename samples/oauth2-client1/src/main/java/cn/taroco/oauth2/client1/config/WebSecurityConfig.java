@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 
 /**
@@ -15,6 +16,7 @@ import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResour
  *
  * @author liuht
  * 2019/5/6 17:54
+ * @see OAuth2ClientAuthenticationProcessingFilter
  */
 @Configuration
 @EnableOAuth2Sso

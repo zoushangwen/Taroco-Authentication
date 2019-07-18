@@ -56,6 +56,9 @@ Spring Security 默认是通过 WebSecurityConfigurerAdapter.getHttp() 方法配
 * 上面的Spring Security Filter被组合到一个FilterChainProxy的过程可以参考配置类WebSecurityConfiguration的方法Filter springSecurityFilterChain(),这是一个bean定义方法，使用的bean名称为AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME:springSecurityFilterChain。
 > FilterChainProxy也是一个Filter,它应用了代理模式和组合模式，它将上面的各个Filter组织到一起在自己内部形成一个filter chain,当自己被调用到时，它其实把任务代理给自己内部的filter chain完成。
 
+> Spring Security 有两个重要的入口Filter, 一个是 AbstractAuthenticationProcessingFilter（主要负责处理登录认证）；一个是 FilterSecurityInterceptor（主要处理鉴权）。
+> UsernamePasswordAuthenticationFilter 就是其中的一个实现类。后面对登录认证的一个扩展，主要就是对 AbstractAuthenticationProcessingFilter 的一个扩展。
+
 ## Spring Security 认证流程
 
 Spring 针对 servlet 默认有一个过滤器链（Filter chain），Spring Security 本质上也是一个连续的 Filter 链，然后又以 FilterChainProxy 的形式被添加到 Servlet 容器的 Filter chain 当中。默认是使用 DefaultSecurityFilterChain，名称为：AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME:springSecurityFilterChain。下图展示了 springSecurityFilterChain 是如何嵌入Servlet 容器的 Filter chain 当中:
@@ -615,7 +618,16 @@ public SmsCodeAuthenticationProvider smsCodeAuthenticationProvider() {
 
 ## Spring Security OAuth2 授权码模式流程
 
+授权码模式是 OAuth2 中最安全的模式，也是最复杂的，我只列举这一个，其他的也是触类旁通，一点即透。
+
+![SpringSecurityOAuth2授权码流程图](docs/imgs/SpringSecurityOAuth2授权码流程图.png "SpringSecurityOAuth2授权码流程图")
+
 ## Spring Security OAuth2 SSO 流程
+
+Spring Security 通过 OAuth2 实现的 SSO，虽然流程较为复杂，但是好在复杂的东西已经封装的非常完美，使用起来只需要一个注解即可搞定。
+我们需要对流程有充分的理解，这样在进行扩展和调试的时候才知道从什么地方入手。
+
+![SpringSecurityOAuth2单点登录流程图](docs/imgs/SpringSecurityOAuth2单点登录流程图.png "SpringSecurityOAuth2单点登录流程图")
 
 ## Spring Security OAuth2 自定义开发
 
