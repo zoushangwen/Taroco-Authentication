@@ -70,6 +70,97 @@ Spring 针对 servlet 默认有一个过滤器链（Filter chain），Spring Sec
 
 ## Spring Security 自定义开发
 
+### 实现异步 JSON 登录
+
+通过熟悉 Spring Security 的认证流程我们知道，读取登录请求参数的地方是在 UsernamePasswordAuthenticationFilter，要想实现异步登录，首先想到的就是重写它。
+但是为了能够使表单登录和异步登录同时有效，我们需要继承 UsernamePasswordAuthenticationFilter，加入自己的逻辑。
+
+1. 继承 UsernamePasswordAuthenticationFilter
+
+```java
+/**
+ * 重写 UsernamePasswordAuthenticationFilter 类, 支持实现异步JSON登录
+ *
+ * @author liuht
+ * 2019/7/3 14:09
+ */
+@Slf4j
+public class CustomUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+
+        // 如果是JSON登录
+        UsernamePasswordAuthenticationToken authRequest;
+        if (request.getContentType().equals(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                || request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)) {
+            ObjectMapper mapper = new ObjectMapper();
+
+            try (InputStream is = request.getInputStream()) {
+                AuthenticationBean authenticationBean = mapper.readValue(is, AuthenticationBean.class);
+                authRequest = new UsernamePasswordAuthenticationToken(
+                        authenticationBean.getUsername(), authenticationBean.getPassword());
+                setDetails(request, authRequest);
+                return this.getAuthenticationManager().authenticate(authRequest);
+            } catch (IOException e) {
+                log.error("异步登陆失败", e);
+            }
+        } else {
+            // 支持原来默认的登录方式
+            return super.attemptAuthentication(request, response);
+        }
+        authRequest = new UsernamePasswordAuthenticationToken("", "");
+        return this.getAuthenticationManager().authenticate(authRequest);
+    }
+}
+
+/**
+ * 用户认证的Bean
+ *
+ * @author liuht
+ * 2019/7/3 14:11
+ */
+@Data
+public class AuthenticationBean {
+
+    private String username;
+
+    private String password;
+}
+```
+
+2. 将自定义的 Filter 添加到 Spring Security 过滤器链当中
+
+```java
+@EnableWebSecurity
+public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
+    
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry =
+                http
+                        .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+    
+    /**
+     * 注册自定义的UsernamePasswordAuthenticationFilter
+     *
+     * @throws Exception
+     */
+    @Bean
+    public CustomUsernamePasswordAuthenticationFilter customAuthenticationFilter() throws Exception {
+        CustomUsernamePasswordAuthenticationFilter filter = new CustomUsernamePasswordAuthenticationFilter();
+        filter.setAuthenticationSuccessHandler(successHandler);
+        filter.setAuthenticationFailureHandler(failureHandler);
+        //这句很关键，重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
+        filter.setAuthenticationManager(authenticationManagerBean());
+        return filter;
+    }
+}
+```
+
+### 自定义手机号/验证码登录
+
 
 
 ## Spring Security OAuth2 授权码模式流程
