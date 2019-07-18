@@ -57,7 +57,7 @@ Spring Security 默认是通过 WebSecurityConfigurerAdapter.getHttp() 方法配
 > FilterChainProxy也是一个Filter,它应用了代理模式和组合模式，它将上面的各个Filter组织到一起在自己内部形成一个filter chain,当自己被调用到时，它其实把任务代理给自己内部的filter chain完成。
 
 > Spring Security 有两个重要的入口Filter, 一个是 AbstractAuthenticationProcessingFilter（主要负责处理登录认证）；一个是 FilterSecurityInterceptor（主要处理鉴权）。
-> UsernamePasswordAuthenticationFilter 就是其中的一个实现类。后面对登录认证的一个扩展，主要就是对 AbstractAuthenticationProcessingFilter 的一个扩展。
+> UsernamePasswordAuthenticationFilter 就是 AbstractAuthenticationProcessingFilter 其中的一个实现类。后面对登录认证的扩展，主要就是对 AbstractAuthenticationProcessingFilter 的扩展。
 
 ## Spring Security 认证流程
 
@@ -631,11 +631,426 @@ Spring Security 通过 OAuth2 实现的 SSO，虽然流程较为复杂，但是�
 
 ## Spring Security OAuth2 自定义开发
 
+### 自定义通过手机号/验证码获取token
+
+和自定义通过手机号/验证码登录十分相似，唯一的不同是在登录认证成功以后，需要返回 token，而不是跳转页面。
+
+1. 第一步，自定义 MobileTokenAuthenticationToken
+
+```java
+/**
+ * 定义手机号获取token 类似与 UsernamePasswordAuthenticationToken
+ *
+ * @author liuht
+ * 2019/5/13 15:20
+ */
+public class MobileTokenAuthenticationToken extends MyAuthenticationToken {
+
+    private static final long serialVersionUID = -9192173797915966518L;
+
+    public MobileTokenAuthenticationToken(Object principal, Object credentials) {
+        super(principal, credentials);
+    }
+
+    public MobileTokenAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+        super(principal, credentials, authorities);
+    }
+}
+```
+
+2. 第二步，自定义 SmsCodeAuthenticationProvider
+
+```java
+/**
+ * 定义手机号获取token校验逻辑
+ *
+ * @author liuht
+ * 2019/5/13 15:25
+ */
+@Slf4j
+public class MobileTokenAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+
+    private UserDetailsService userDetailsService;
+
+    private TarocoRedisRepository redisRepository;
+
+    @Override
+    protected Authentication createSuccessAuthentication(final Object principal, final Authentication authentication, final UserDetails user) {
+        final MobileTokenAuthenticationToken token = new MobileTokenAuthenticationToken(principal, authentication.getCredentials(), user.getAuthorities());
+        token.setDetails(authentication.getDetails());
+        return token;
+    }
+
+    @Override
+    protected void additionalAuthenticationChecks(final UserDetails userDetails, final Authentication authentication) throws AuthenticationException {
+        if (authentication.getCredentials() == null) {
+            log.error("Authentication failed: no credentials provided");
+            throw new BadCredentialsException(this.messages.getMessage("MobileAuthenticationProvider.badCredentials", "Bad credentials"));
+        } else {
+            final String presentedPassword = authentication.getCredentials().toString();
+            final Object principal = authentication.getPrincipal();
+            final String key = CacheConstants.DEFAULT_CODE_KEY + principal;
+            final String code = redisRepository.get(key);
+            // 校验验证码
+            if (StrUtil.isEmpty(code) || !code.equals(presentedPassword)) {
+                log.error("Authentication failed: verifyCode does not match stored value");
+                throw new BadCredentialsException(this.messages.getMessage("MobileAuthenticationProvider.badCredentials", "Bad verifyCode"));
+            }
+            // 校验成功删除验证码(验证码只能使用一次)
+            redisRepository.del(key);
+        }
+    }
+
+    @Override
+    protected UserDetails retrieveUser(final String mobile, final Authentication authentication) throws AuthenticationException {
+        UserDetails loadedUser;
+        try {
+            loadedUser = userDetailsService.loadUserByUsername(mobile);
+        } catch (UsernameNotFoundException var6) {
+            throw var6;
+        } catch (Exception var7) {
+            throw new InternalAuthenticationServiceException(var7.getMessage(), var7);
+        }
+        if (loadedUser == null) {
+            throw new InternalAuthenticationServiceException("UserDetailsService returned null, which is an interface contract violation");
+        } else {
+            return loadedUser;
+        }
+    }
+
+    @Override
+    public boolean supports(final Class<?> authentication) {
+        return MobileTokenAuthenticationToken.class.isAssignableFrom(authentication);
+    }
+
+    public UserDetailsService getUserDetailsService() {
+        return userDetailsService;
+    }
+
+    public void setUserDetailsService(final UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    public TarocoRedisRepository getRedisRepository() {
+        return redisRepository;
+    }
+
+    public void setRedisRepository(final TarocoRedisRepository redisRepository) {
+        this.redisRepository = redisRepository;
+    }
+}
+```
+
+3. 第三步，自定义 MobileTokenAuthenticationFilter
+
+```java
+/**
+ * 手机号获取token登录认证filter
+ * 通过手机号直接获取 token
+ *
+ * @author liuht
+ * 2019/5/13 15:37
+ */
+public class MobileTokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+
+    private static final String SPRING_SECURITY_RESTFUL_PHONE_KEY = "mobile";
+    private static final String SPRING_SECURITY_RESTFUL_VERIFY_CODE_KEY = "code";
+
+    private boolean postOnly = true;
+
+    public MobileTokenAuthenticationFilter() {
+        // 定义一个指定路径的手机号登录前缀
+        super(new AntPathRequestMatcher(SecurityConstants.MOBILE_TOKEN_URL, HttpMethod.POST.name()));
+    }
+
+    @Override
+    public Authentication attemptAuthentication(final HttpServletRequest request, final HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+        if (postOnly && !request.getMethod().equals(HttpMethod.POST.name())) {
+            throw new AuthenticationServiceException(
+                    "Authentication method not supported: " + request.getMethod());
+        }
+
+        AbstractAuthenticationToken authRequest;
+        String principal;
+        String credentials;
+
+        // 手机验证码登陆
+        principal = obtainParameter(request, SPRING_SECURITY_RESTFUL_PHONE_KEY);
+        credentials = obtainParameter(request, SPRING_SECURITY_RESTFUL_VERIFY_CODE_KEY);
+
+        principal = principal.trim();
+        authRequest = new MobileTokenAuthenticationToken(principal, credentials);
+        setDetails(request, authRequest);
+        return this.getAuthenticationManager().authenticate(authRequest);
+    }
+
+    private String obtainParameter(HttpServletRequest request, String parameter) {
+        String result =  request.getParameter(parameter);
+        return result == null ? "" : result;
+    }
+
+    protected void setDetails(HttpServletRequest request,
+                              AbstractAuthenticationToken authRequest) {
+        authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
+    }
+
+    public void setPostOnly(boolean postOnly) {
+        this.postOnly = postOnly;
+    }
+
+    public boolean isPostOnly() {
+        return postOnly;
+    }
+}
+```
+
+4. 自定义，MobileTokenLoginSuccessHandler MobileTokenLoginFailureHandler
+
+```java
+/**
+ * 手机号登录成功, 直接返回token
+ *
+ * @author liuht
+ * 2019/5/15 16:03
+ * @see SavedRequestAwareAuthenticationSuccessHandler
+ */
+@Component
+@Slf4j
+@Data
+public class MobileTokenLoginSuccessHandler implements AuthenticationSuccessHandler {
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private ClientDetailsService clientDetailsService;
+
+    @Autowired
+    private DefaultTokenServices tokenServices;
+
+    @Override
+    public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response, final Authentication authentication) throws IOException, ServletException {
+        final String header = request.getHeader(SecurityConstants.AUTHORIZATION);
+
+        if (header == null || !header.startsWith(SecurityConstants.BASIC_HEADER)) {
+            throw new UnapprovedClientAuthenticationException("请求头中client信息为空");
+        }
+        try {
+            final String[] tokens = extractAndDecodeHeader(header);
+            assert tokens.length == 2;
+            final String clientId = tokens[0];
+
+            final ClientDetails clientDetails = clientDetailsService.loadClientByClientId(clientId);
+            final TokenRequest tokenRequest = new TokenRequest(MapUtil.newHashMap(), clientId, clientDetails.getScope(), "mobile");
+            final OAuth2Request oAuth2Request = tokenRequest.createOAuth2Request(clientDetails);
+
+            final OAuth2Authentication oAuth2Authentication = new OAuth2Authentication(oAuth2Request, authentication);
+            final OAuth2AccessToken oAuth2AccessToken = tokenServices.createAccessToken(oAuth2Authentication);
+            if (log.isDebugEnabled()) {
+                log.debug("MobileLoginSuccessHandler 签发token 成功：{}", oAuth2AccessToken.getValue());
+            }
+
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+            final PrintWriter printWriter = response.getWriter();
+            printWriter.append(objectMapper.writeValueAsString(oAuth2AccessToken));
+        } catch (IOException e) {
+            throw new BadCredentialsException("Failed to decode basic authentication token");
+        }
+    }
+
+    /**
+     * Decodes the header into a username and password.
+     *
+     * @throws BadCredentialsException if the Basic header is not present or is not valid
+     *                                 Base64
+     */
+    private String[] extractAndDecodeHeader(String header) throws IOException {
+        final byte[] base64Token = header.substring(6).getBytes(StandardCharsets.UTF_8);
+        byte[] decoded;
+        try {
+            decoded = Base64.decode(base64Token);
+        } catch (IllegalArgumentException e) {
+            throw new BadCredentialsException("Failed to decode basic authentication token");
+        }
+        final String token = new String(decoded, StandardCharsets.UTF_8);
+
+        final int delim = token.indexOf(":");
+
+        if (delim == -1) {
+            throw new BadCredentialsException("Invalid basic authentication token");
+        }
+        return new String[] {token.substring(0, delim), token.substring(delim + 1)};
+    }
+}
+
+/**
+ * 手机登录失败返回
+ *
+ * @author liuht
+ * 2019/5/16 9:37
+ */
+@Component
+@Slf4j
+public class MobileTokenLoginFailureHandler implements AuthenticationFailureHandler {
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Override
+    public void onAuthenticationFailure(final HttpServletRequest request,
+                                        final HttpServletResponse response,
+                                        final AuthenticationException exception) throws IOException, ServletException {
+        if (log.isDebugEnabled()) {
+            log.debug("MobileLoginFailureHandler:" + exception.getMessage());
+        }
+        final Response resp = Response.failure(exception.getMessage());
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+        response.getWriter().write(objectMapper.writeValueAsString(resp));
+    }
+}
+```
+
+5. 最后，配置到 Spring Security 当中去：
+
+```
+http.addFilterAfter(mobileTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+
+@Override
+protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth
+            // 默认的用户名密码认证器
+            .authenticationProvider(daoAuthenticationProvider())
+            // 手机号获取token认证器
+            .authenticationProvider(mobileTokenAuthenticationProvider());
+}
+
+/**
+ * 手机号获取token过滤器
+ */
+@Bean
+public MobileTokenAuthenticationFilter mobileTokenAuthenticationFilter() throws Exception {
+    final MobileTokenAuthenticationFilter filter = new MobileTokenAuthenticationFilter();
+    filter.setAuthenticationManager(authenticationManagerBean());
+    filter.setAuthenticationSuccessHandler(mobileTokenLoginSuccessHandler);
+    filter.setAuthenticationFailureHandler(mobileTokenLoginFailureHandler);
+    return filter;
+}
+
+/**
+ * 手机号获取token认证逻辑
+ */
+@Bean
+public MobileTokenAuthenticationProvider mobileTokenAuthenticationProvider() {
+    final MobileTokenAuthenticationProvider provider = new MobileTokenAuthenticationProvider();
+    provider.setRedisRepository(redisRepository);
+    provider.setUserDetailsService(mobileUserDetailsService);
+    provider.setHideUserNotFoundExceptions(false);
+    return provider;
+}
+```
+
 ## Spring Security 用户权限管理方案
 
 ### Scope & Authority
 
+Scope 是客户端（应用）的权限范围，一般是 Read、Write、All、Server 之类的常见字符，也可根据实际情况自定义。
+
+Authority 是用户的权限范围。在 Spring Security OAuth2 当中，解析 token 会附带的将用户的权限一并解析。
+
 ### 用户权限方案
+
+用户信息由 UserDetailsService 加载，用户权限信息也可以由自定义的 UserDetailsService 一起加载到 UserDetails。也可以在用户认证成功过后，在通过用户ID、用户名再次请求用户权限。
+
+在 Spring Security 当中，由于只有一个 Authority 的概念存在，
+
+## 认证服务集群部署
+
+### Redis 管理授权码
+
+授权码默认的实现是 InMemoryAuthorizationCodeServices，为了能够支撑认证服务的集群部署，扩展为 Redis 管理授权码
+
+```java
+/**
+ * 自定义AuthorizationCodeServices实现类来将auth_code 存放在redis中
+ *
+ * @author liuht
+ * 2019/7/17 10:14
+ */
+@Slf4j
+public class RedisAuthenticationCodeServices extends RandomValueAuthorizationCodeServices {
+
+    private static final String AUTH_CODE_KEY = "auth_code";
+
+    private RedisTokenStoreSerializationStrategy serializationStrategy = new JdkSerializationStrategy();
+
+    private static final String PREFIX = CacheConstants.PREFIX + AUTH_CODE_KEY;
+
+    private RedisConnectionFactory connectionFactory;
+
+    private RedisConnection getConnection() {
+        return connectionFactory.getConnection();
+    }
+
+    public RedisAuthenticationCodeServices(RedisConnectionFactory connectionFactory) {
+        Assert.notNull(connectionFactory, "RedisConnectionFactory required");
+        this.connectionFactory = connectionFactory;
+    }
+
+    @Override
+    protected void store(final String code, final OAuth2Authentication authentication) {
+        RedisConnection conn = getConnection();
+        try {
+            conn.hSet(serializationStrategy.serialize(PREFIX),
+                    serializationStrategy.serialize(code),
+                    serializationStrategy.serialize(authentication));
+        } catch (Exception e) {
+            log.error("保存authentication code 失败", e);
+        } finally {
+            conn.close();
+        }
+    }
+
+    @Override
+    protected OAuth2Authentication remove(final String code) {
+        RedisConnection conn = getConnection();
+        try {
+            OAuth2Authentication authentication;
+            try {
+                authentication = serializationStrategy.deserialize(conn.hGet(serializationStrategy.serialize(PREFIX),
+                        serializationStrategy.serialize(code)), OAuth2Authentication.class);
+            } catch (Exception e) {
+                return null;
+            }
+            if (null != authentication) {
+                conn.hDel(serializationStrategy.serialize(PREFIX), serializationStrategy.serialize(code));
+            }
+            return authentication;
+        } catch (Exception e) {
+            return null;
+        } finally {
+            conn.close();
+        }
+    }
+}
+```
+
+配置替换默认的实现
+
+```
+@Override
+public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
+    endpoints.authorizationCodeServices(redisAuthenticationCodeServices());
+}
+
+@Bean
+public RedisAuthenticationCodeServices redisAuthenticationCodeServices() {
+    return new RedisAuthenticationCodeServices(redisConnectionFactory);
+}
+```
+
+### 集成 Spring Session Redis
 
 ## 扩展
 
