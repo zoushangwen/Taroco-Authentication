@@ -963,7 +963,80 @@ Authority 是用户的权限范围。在 Spring Security OAuth2 当中，解析 
 
 用户信息由 UserDetailsService 加载，用户权限信息也可以由自定义的 UserDetailsService 一起加载到 UserDetails。也可以在用户认证成功过后，在通过用户ID、用户名再次请求用户权限。
 
-在 Spring Security 当中，由于只有一个 Authority 的概念存在，
+在 Spring Security 当中，由于只有一个 Authority 的概念存在，关于用户的角色以及用户的资源权限，我们只能放在 Authority 当中，好在 Spring Security 对角色和权限已经做了区分。
+
+在 SecurityExpressionRoot 当中，对角色做了单独的处理，加了默认的前缀 “ROLE_”，因此我们在创建角色的 Authority 的时候，只需要加入这个前缀即可，“hasRole("ROLE_ADMIN")” 和 “hasRole("ADMIN")” 是一样的效果：
+
+```java
+@Data
+@AllArgsConstructor
+public class Role implements GrantedAuthority {
+
+    private static final long serialVersionUID = -1956975342008354518L;
+
+    private static final String PREFIX = "ROLE_";
+
+    private String role;
+
+    private List<Operation> operations;
+
+    @Override
+    public String getAuthority() {
+        return PREFIX + role.toUpperCase();
+    }
+}
+```
+
+一个角色对应多个可执行的操作权限（资源），资源同样是作为 Authority 存在，我给资源加入一个自定义的前缀标识 “OP_”，以便在 Authority 当中进行区分：
+
+```java
+@Data
+@AllArgsConstructor
+public class Operation implements GrantedAuthority {
+
+    private static final long serialVersionUID = 6260083887682221456L;
+
+    private static final String PREFIX = "OP_";
+
+    private String op;
+
+    @Override
+    public String getAuthority() {
+        return PREFIX + op.toUpperCase();
+    }
+}
+```
+
+这样我们在自定义的 UserDetails 实现当中，加入角色并且重写 getAuthorities() 方法即可：
+
+```java
+@Data
+public class User implements Serializable, UserDetails {
+
+    private static final long serialVersionUID = 8741046663436494432L;
+
+    /**
+     * 角色列表
+     */
+    private List<Role> roles = new ArrayList<>();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (CollUtil.isEmpty(roles)) {
+            return Collections.emptyList();
+        }
+        final List<GrantedAuthority> authorities = new ArrayList<>(AuthorityUtils.createAuthorityList(
+                roles.stream().map(Role::getAuthority).collect(Collectors.joining())));
+        roles.forEach(role -> {
+            if (CollUtil.isNotEmpty(role.getOperations())) {
+                authorities.addAll(AuthorityUtils.createAuthorityList(
+                        role.getOperations().stream().map(Operation::getAuthority).collect(Collectors.joining())));
+            }
+        });
+        return authorities;
+    }
+}
+```
 
 ## 认证服务集群部署
 
@@ -1051,6 +1124,39 @@ public RedisAuthenticationCodeServices redisAuthenticationCodeServices() {
 ```
 
 ### 集成 Spring Session Redis
+
+1. 添加 maven 依赖
+
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.session</groupId>
+    <artifactId>spring-session-data-redis</artifactId>
+</dependency>
+```
+
+2. 配置 Spring Session
+
+```
+# 配置文件设置 Session 存储类型 && 配置 Redis
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: hyman
+    database: 0
+  session:
+    store-type: redis
+
+# 启动类添加注解，启用 Spring Session
+@EnableRedisHttpSession(redisNamespace = CacheConstants.REDIS_SESSION_PREFIX)
+```
+
+> 简单的两步之后，集成就算完成了。@EnableRedisHttpSession 主要就是添加了一个名为 springSessionRepositoryFilter 的过滤器，实现类为 SessionRepositoryFilter。
+> 这个 filter 具有高优先级，会在 Spring Security 之前将 HttpSession 的实现改为由 Spring Session 进行管理。
 
 ## 扩展
 
