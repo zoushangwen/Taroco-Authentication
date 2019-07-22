@@ -1,19 +1,13 @@
 package cn.taroco.oauth2.authentication.config;
 
+import cn.taroco.oauth2.authentication.config.extend.MobileTokenAuthenticationSecurityConfigration;
+import cn.taroco.oauth2.authentication.config.extend.SmsCodeAuthenticationSecurityConfigration;
 import cn.taroco.oauth2.authentication.filter.CustomUsernamePasswordAuthenticationFilter;
-import cn.taroco.oauth2.authentication.filter.MobileTokenAuthenticationFilter;
-import cn.taroco.oauth2.authentication.filter.SmsCodeAuthenticationFilter;
 import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
 import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
-import cn.taroco.oauth2.authentication.handler.MobileTokenLoginFailureHandler;
-import cn.taroco.oauth2.authentication.handler.MobileTokenLoginSuccessHandler;
 import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationFailureHandler;
 import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationSuccessHandler;
 import cn.taroco.oauth2.authentication.handler.UsernamePasswordLogoutSuccessHandler;
-import cn.taroco.oauth2.authentication.provider.MobileTokenAuthenticationProvider;
-import cn.taroco.oauth2.authentication.provider.SmsCodeAuthenticationProvider;
-import cn.taroco.oauth2.authentication.redis.TarocoRedisRepository;
-import cn.taroco.oauth2.authentication.service.MobileUserDetailsService;
 import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
@@ -21,9 +15,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecu
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
@@ -59,18 +51,6 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     private UserNameUserDetailsServiceImpl userNameUserDetailsService;
 
     @Autowired
-    private MobileUserDetailsService mobileUserDetailsService;
-
-    @Autowired
-    private TarocoRedisRepository redisRepository;
-
-    @Autowired
-    private MobileTokenLoginFailureHandler mobileTokenLoginFailureHandler;
-
-    @Autowired
-    private MobileTokenLoginSuccessHandler mobileTokenLoginSuccessHandler;
-
-    @Autowired
     private UsernamePasswordAuthenticationSuccessHandler successHandler;
 
     @Autowired
@@ -85,14 +65,24 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     @Autowired
     private UsernamePasswordLogoutSuccessHandler logoutSuccessHandler;
 
+    @Autowired
+    private MobileTokenAuthenticationSecurityConfigration mobileTokenAuthenticationSecurityConfigration;
+
+    @Autowired
+    private SmsCodeAuthenticationSecurityConfigration smsCodeAuthenticationSecurityConfigration;
+
     private static final String RM_KEY = UUID.randomUUID().toString();
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry =
                 http
-                        .addFilterAfter(mobileTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                        .addFilterAfter(smsCodeAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                        // 默认的用户名密码认证器
+                        .authenticationProvider(daoAuthenticationProvider())
+                        .apply(mobileTokenAuthenticationSecurityConfigration)
+                        .and()
+                        .apply(smsCodeAuthenticationSecurityConfigration)
+                        .and()
                         .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                         .formLogin().loginPage("/").permitAll()
                         .loginProcessingUrl("/login").permitAll()
@@ -112,22 +102,6 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
         registry.anyRequest().authenticated().and().cors().and().csrf().disable();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                // 默认的用户名密码认证器
-                .authenticationProvider(daoAuthenticationProvider())
-                // 手机号获取token认证器
-                .authenticationProvider(mobileTokenAuthenticationProvider())
-                // 手机号验证码登录认证器
-                .authenticationProvider(smsCodeAuthenticationProvider());
-    }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/static/**");
-    }
-
     /**
      * 加密器 spring boot 2.x没有默认的加密器了
      *
@@ -145,6 +119,20 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    /**
+     * 默认的用户名密码 AuthenticationProvider
+     *
+     * @return
+     */
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userNameUserDetailsService);
+        daoAuthenticationProvider.setHideUserNotFoundExceptions(false);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return daoAuthenticationProvider;
     }
 
     /**
@@ -170,67 +158,5 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
         final JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
         tokenRepository.setDataSource(dataSource);
         return new PersistentTokenBasedRememberMeServices(RM_KEY, userNameUserDetailsService, tokenRepository);
-    }
-
-    /**
-     * 默认的用户名密码 AuthenticationProvider
-     *
-     * @return
-     */
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userNameUserDetailsService);
-        daoAuthenticationProvider.setHideUserNotFoundExceptions(false);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        return daoAuthenticationProvider;
-    }
-
-    /**
-     * 手机号获取token过滤器
-     */
-    @Bean
-    public MobileTokenAuthenticationFilter mobileTokenAuthenticationFilter() throws Exception {
-        final MobileTokenAuthenticationFilter filter = new MobileTokenAuthenticationFilter();
-        filter.setAuthenticationManager(authenticationManagerBean());
-        filter.setAuthenticationSuccessHandler(mobileTokenLoginSuccessHandler);
-        filter.setAuthenticationFailureHandler(mobileTokenLoginFailureHandler);
-        return filter;
-    }
-
-    /**
-     * 手机号获取token认证逻辑
-     */
-    @Bean
-    public MobileTokenAuthenticationProvider mobileTokenAuthenticationProvider() {
-        final MobileTokenAuthenticationProvider provider = new MobileTokenAuthenticationProvider();
-        provider.setRedisRepository(redisRepository);
-        provider.setUserDetailsService(mobileUserDetailsService);
-        provider.setHideUserNotFoundExceptions(false);
-        return provider;
-    }
-
-    /**
-     * 手机号验证码登录filter
-     */
-    @Bean
-    public SmsCodeAuthenticationFilter smsCodeAuthenticationFilter() throws Exception {
-        final SmsCodeAuthenticationFilter filter = new SmsCodeAuthenticationFilter();
-        filter.setAuthenticationManager(authenticationManagerBean());
-        filter.setAuthenticationSuccessHandler(successHandler);
-        filter.setAuthenticationFailureHandler(failureHandler);
-        return filter;
-    }
-
-    /**
-     * 手机号验证码登录认证逻辑
-     */
-    @Bean
-    public SmsCodeAuthenticationProvider smsCodeAuthenticationProvider() {
-        final SmsCodeAuthenticationProvider provider = new SmsCodeAuthenticationProvider();
-        provider.setRedisRepository(redisRepository);
-        provider.setUserDetailsService(mobileUserDetailsService);
-        provider.setHideUserNotFoundExceptions(false);
-        return provider;
     }
 }

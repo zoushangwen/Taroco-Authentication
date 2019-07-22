@@ -22,7 +22,7 @@ import java.util.Collections;
 public class MockUserService {
 
     @Autowired
-    private static PasswordEncoder encoder;
+    private PasswordEncoder encoder;
 
     private static final String PWD = "$2a$10$X8qJKHLTM9MjCVv9JE.dNOkqzuXkLfJ5kdt45x9AG.7aFby8JLdAC";
 

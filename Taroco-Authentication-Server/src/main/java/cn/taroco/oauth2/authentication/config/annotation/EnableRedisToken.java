@@ -1,6 +1,6 @@
 package cn.taroco.oauth2.authentication.config.annotation;
 
-import cn.taroco.oauth2.authentication.config.RedisTokenConfigration;
+import cn.taroco.oauth2.authentication.config.token.RedisTokenConfigration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.Documented;

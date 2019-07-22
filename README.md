@@ -573,45 +573,46 @@ public class SmsCodeAuthenticationFilter extends AbstractAuthenticationProcessin
 > 在这里通过获取参数生成我们自定义的 SmsCodeAuthenticationToken，交给 AuthenticationManager 进行认证。
 > 同时我们自定义的这个 url 需要添加到 Spring Security 放行的队列当中。
 
-最后，需要将我们自定义的内容加入到 Spring Security 的配置当中:
+最后，我们定义一个自定义一个 SecurityConfigurerAdapter，并且 apply 到主配置类当中：
 
-```
-@Override
-protected void configure(HttpSecurity http) throws Exception {
-    http.addFilterAfter(smsCodeAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-}
-
-@Override
-protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth
-            // 加入自定义的认证器之前需要先添加默认的用户名密码认证器
-            .authenticationProvider(daoAuthenticationProvider())
-            // 手机号验证码登录认证器
-            .authenticationProvider(smsCodeAuthenticationProvider());
-}
-
+```java
 /**
- * 手机号验证码登录filter
+ * 手机号/验证码登录 安全配置
+ *
+ * @author liuht
+ * 2019/7/22 16:14
  */
-@Bean
-public SmsCodeAuthenticationFilter smsCodeAuthenticationFilter() throws Exception {
-    final SmsCodeAuthenticationFilter filter = new SmsCodeAuthenticationFilter();
-    filter.setAuthenticationManager(authenticationManagerBean());
-    filter.setAuthenticationSuccessHandler(successHandler);
-    filter.setAuthenticationFailureHandler(failureHandler);
-    return filter;
-}
+@Component
+public class SmsCodeAuthenticationSecurityConfigration extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
-/**
- * 手机号验证码登录认证逻辑
- */
-@Bean
-public SmsCodeAuthenticationProvider smsCodeAuthenticationProvider() {
-    final SmsCodeAuthenticationProvider provider = new SmsCodeAuthenticationProvider();
-    provider.setRedisRepository(redisRepository);
-    provider.setUserDetailsService(mobileUserDetailsService);
-    provider.setHideUserNotFoundExceptions(false);
-    return provider;
+    @Autowired
+    private TarocoRedisRepository redisRepository;
+
+    @Autowired
+    private MobileUserDetailsService mobileUserDetailsService;
+
+    @Autowired
+    private UsernamePasswordAuthenticationSuccessHandler successHandler;
+
+    @Autowired
+    private UsernamePasswordAuthenticationFailureHandler failureHandler;
+
+    @Override
+    public void configure(final HttpSecurity http) throws Exception {
+        final SmsCodeAuthenticationFilter filter = new SmsCodeAuthenticationFilter();
+        filter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
+        filter.setAuthenticationSuccessHandler(successHandler);
+        filter.setAuthenticationFailureHandler(failureHandler);
+
+        final SmsCodeAuthenticationProvider provider = new SmsCodeAuthenticationProvider();
+        provider.setRedisRepository(redisRepository);
+        provider.setUserDetailsService(mobileUserDetailsService);
+        provider.setHideUserNotFoundExceptions(false);
+
+        http
+                .authenticationProvider(provider)
+                .addFilterAfter(filter, UsernamePasswordAuthenticationFilter.class);
+    }
 }
 
 ```
@@ -912,42 +913,46 @@ public class MobileTokenLoginFailureHandler implements AuthenticationFailureHand
 }
 ```
 
-5. 最后，配置到 Spring Security 当中去：
+5. 最后，我们定义一个自定义一个 SecurityConfigurerAdapter，并且 apply 到主配置类当中：
 
-```
-http.addFilterAfter(mobileTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-
-@Override
-protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth
-            // 默认的用户名密码认证器
-            .authenticationProvider(daoAuthenticationProvider())
-            // 手机号获取token认证器
-            .authenticationProvider(mobileTokenAuthenticationProvider());
-}
-
+```java
 /**
- * 手机号获取token过滤器
+ * 手机号/验证码获取Token 安全配置
+ *
+ * @author liuht
+ * 2019/7/22 16:14
  */
-@Bean
-public MobileTokenAuthenticationFilter mobileTokenAuthenticationFilter() throws Exception {
-    final MobileTokenAuthenticationFilter filter = new MobileTokenAuthenticationFilter();
-    filter.setAuthenticationManager(authenticationManagerBean());
-    filter.setAuthenticationSuccessHandler(mobileTokenLoginSuccessHandler);
-    filter.setAuthenticationFailureHandler(mobileTokenLoginFailureHandler);
-    return filter;
-}
+@Component
+public class MobileTokenAuthenticationSecurityConfigration extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
-/**
- * 手机号获取token认证逻辑
- */
-@Bean
-public MobileTokenAuthenticationProvider mobileTokenAuthenticationProvider() {
-    final MobileTokenAuthenticationProvider provider = new MobileTokenAuthenticationProvider();
-    provider.setRedisRepository(redisRepository);
-    provider.setUserDetailsService(mobileUserDetailsService);
-    provider.setHideUserNotFoundExceptions(false);
-    return provider;
+    @Autowired
+    private TarocoRedisRepository redisRepository;
+
+    @Autowired
+    private MobileUserDetailsService mobileUserDetailsService;
+
+    @Autowired
+    private MobileTokenLoginFailureHandler mobileTokenLoginFailureHandler;
+
+    @Autowired
+    private MobileTokenLoginSuccessHandler mobileTokenLoginSuccessHandler;
+
+    @Override
+    public void configure(final HttpSecurity http) throws Exception {
+        final MobileTokenAuthenticationFilter filter = new MobileTokenAuthenticationFilter();
+        filter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
+        filter.setAuthenticationSuccessHandler(mobileTokenLoginSuccessHandler);
+        filter.setAuthenticationFailureHandler(mobileTokenLoginFailureHandler);
+
+        final MobileTokenAuthenticationProvider provider = new MobileTokenAuthenticationProvider();
+        provider.setRedisRepository(redisRepository);
+        provider.setUserDetailsService(mobileUserDetailsService);
+        provider.setHideUserNotFoundExceptions(false);
+
+        http
+                .authenticationProvider(provider)
+                .addFilterAfter(filter, UsernamePasswordAuthenticationFilter.class);
+    }
 }
 ```
 

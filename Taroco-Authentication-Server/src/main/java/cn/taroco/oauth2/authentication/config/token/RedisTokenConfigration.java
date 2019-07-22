@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.config;
+package cn.taroco.oauth2.authentication.config.token;
 
 import cn.taroco.oauth2.authentication.consts.CacheConstants;
 import org.springframework.beans.factory.annotation.Autowired;

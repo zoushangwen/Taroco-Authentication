@@ -1,6 +1,6 @@
 package cn.taroco.oauth2.authentication.config.annotation;
 
-import cn.taroco.oauth2.authentication.config.JwtTokenConfigration;
+import cn.taroco.oauth2.authentication.config.token.JwtTokenConfigration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.Documented;
