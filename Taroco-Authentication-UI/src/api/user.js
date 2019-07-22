@@ -3,13 +3,29 @@ import { axios } from '@/utils/request'
 /**
  * 用户登录
  *
- * @param {用户名,密码} parameter
+ * @param {用户名,密码} data
  */
-export function login (parameter) {
+export function login (data) {
+  const { username, password } = data
   return axios({
     url: '/login',
     method: 'post',
-    data: parameter
+    data: { username, password },
+    params: { 'remember-me': data['remember-me'] }
+  })
+}
+
+/**
+ * 手机号登录
+ *
+ * @param {手机号} mobile
+ * @param {验证码} code
+ */
+export const loginByMobile = (params) => {
+  return axios({
+    url: '/login/mobile',
+    method: 'post',
+    params
   })
 }
 
@@ -40,19 +56,5 @@ export function smsCode (mobile) {
   return axios({
     url: `/smsCode/${mobile}`,
     method: 'get'
-  })
-}
-
-/**
- * 手机号登录
- *
- * @param {手机号} mobile
- * @param {验证码} code
- */
-export const loginByMobile = (params) => {
-  return axios({
-    url: '/login/mobile',
-    method: 'post',
-    params
   })
 }

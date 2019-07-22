@@ -70,16 +70,16 @@
         </a-tab-pane>
       </a-tabs>
 
-      <!-- <a-form-item>
-        <a-checkbox v-decorator="['rememberMe']">自动登录</a-checkbox>
-        <router-link
+      <a-form-item style="margin-bottom:0">
+        <a-checkbox v-decorator="['remember-me']">自动登录</a-checkbox>
+        <!-- <router-link
           :to="{ name: 'recover', params: { user: 'aaa'} }"
           class="forge-password"
           style="float: right;"
-        >忘记密码</router-link>
-      </a-form-item> -->
+        >忘记密码</router-link> -->
+      </a-form-item>
 
-      <a-form-item style="margin-top:24px">
+      <a-form-item>
         <a-button
           size="large"
           type="primary"
@@ -160,7 +160,7 @@ export default {
 
       state.loginBtn = true
 
-      const validateFieldsKey = customActiveKey === 'tab1' ? ['username', 'password'] : ['mobile', 'code']
+      const validateFieldsKey = customActiveKey === 'tab1' ? ['username', 'password', 'remember-me'] : ['mobile', 'code', 'remember-me']
 
       validateFields(validateFieldsKey, { force: true }, (err, values) => {
         if (!err) {

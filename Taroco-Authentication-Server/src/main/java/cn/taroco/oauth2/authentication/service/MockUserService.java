@@ -22,7 +22,9 @@ import java.util.Collections;
 public class MockUserService {
 
     @Autowired
-    private PasswordEncoder encoder;
+    private static PasswordEncoder encoder;
+
+    private static final String PWD = "$2a$10$X8qJKHLTM9MjCVv9JE.dNOkqzuXkLfJ5kdt45x9AG.7aFby8JLdAC";
 
     /**
      * 根据用户名称返回用户
@@ -34,7 +36,7 @@ public class MockUserService {
         final User user = new User();
         user.setUsername(username);
         // 密码和用户名保持一致
-        user.setPassword(encoder.encode(username));
+        user.setPassword(PWD);
         user.setEnabled(true);
         user.setUserId(RandomUtil.randomInt());
         user.setEnabled(true);

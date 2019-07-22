@@ -1158,7 +1158,7 @@ spring:
 > 简单的两步之后，集成就算完成了。@EnableRedisHttpSession 主要就是添加了一个名为 springSessionRepositoryFilter 的过滤器，实现类为 SessionRepositoryFilter。
 > 这个 filter 具有高优先级，会在 Spring Security 之前将 HttpSession 的实现改为由 Spring Session 进行管理。
 
-## 扩展
+## 用户扩展
 
 用户以及用户权限方面留给使用者自己去扩展，这里只是使用了一个 `MockUserService` 模拟了获取用户的过程，以及其他相关的角色、组织、接口权限都属于扩展的部分，统一认证只做认证做的事情。
 

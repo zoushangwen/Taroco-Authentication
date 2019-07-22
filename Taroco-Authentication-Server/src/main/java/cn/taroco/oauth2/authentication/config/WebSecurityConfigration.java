@@ -29,9 +29,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 
+import javax.sql.DataSource;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * webSecurity 权限控制类
@@ -43,6 +48,9 @@ import java.util.List;
  */
 @EnableWebSecurity
 public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private DataSource dataSource;
 
     @Autowired
     private TarocoOauth2Properties oauth2Properties;
@@ -77,6 +85,8 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
     @Autowired
     private UsernamePasswordLogoutSuccessHandler logoutSuccessHandler;
 
+    private static final String RM_KEY = UUID.randomUUID().toString();
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry =
@@ -93,6 +103,8 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
                         //.authenticationEntryPoint(exceptionEntryPoint)
                         // 认证过的用户访问无权限资源时的异常
                         .accessDeniedHandler(accessDeniedHandler)
+                        // 开启RememberMe
+                        .and().rememberMe().key(RM_KEY).rememberMeServices(rememberMeServices())
                         .and().authorizeRequests();
 
         final List<String> urlPermitAll = oauth2Properties.getUrlPermitAll();
@@ -145,9 +157,19 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
         CustomUsernamePasswordAuthenticationFilter filter = new CustomUsernamePasswordAuthenticationFilter();
         filter.setAuthenticationSuccessHandler(successHandler);
         filter.setAuthenticationFailureHandler(failureHandler);
+        filter.setRememberMeServices(rememberMeServices());
         //这句很关键，重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
         filter.setAuthenticationManager(authenticationManagerBean());
         return filter;
+    }
+
+    /**
+     * RememberMeServices
+     */
+    public RememberMeServices rememberMeServices() {
+        final JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+        tokenRepository.setDataSource(dataSource);
+        return new PersistentTokenBasedRememberMeServices(RM_KEY, userNameUserDetailsService, tokenRepository);
     }
 
     /**
