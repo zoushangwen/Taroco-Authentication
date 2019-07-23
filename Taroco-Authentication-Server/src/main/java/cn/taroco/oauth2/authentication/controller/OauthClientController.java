@@ -1,7 +1,7 @@
 package cn.taroco.oauth2.authentication.controller;
 
 import cn.taroco.oauth2.authentication.controller.groups.Add;
-import cn.taroco.oauth2.authentication.core.Response;
+import cn.taroco.oauth2.authentication.mvc.response.Response;
 import cn.taroco.oauth2.authentication.service.client.OauthClientService;
 import cn.taroco.oauth2.authentication.vo.OauthClientVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

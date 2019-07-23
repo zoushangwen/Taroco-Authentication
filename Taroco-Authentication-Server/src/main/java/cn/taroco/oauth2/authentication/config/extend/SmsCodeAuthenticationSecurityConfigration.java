@@ -1,11 +1,11 @@
 package cn.taroco.oauth2.authentication.config.extend;
 
-import cn.taroco.oauth2.authentication.filter.SmsCodeAuthenticationFilter;
-import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationFailureHandler;
-import cn.taroco.oauth2.authentication.handler.UsernamePasswordAuthenticationSuccessHandler;
-import cn.taroco.oauth2.authentication.provider.SmsCodeAuthenticationProvider;
-import cn.taroco.oauth2.authentication.redis.TarocoRedisRepository;
-import cn.taroco.oauth2.authentication.service.MobileUserDetailsService;
+import cn.taroco.oauth2.authentication.mvc.filter.SmsCodeAuthenticationFilter;
+import cn.taroco.oauth2.authentication.mvc.handler.UsernamePasswordAuthenticationFailureHandler;
+import cn.taroco.oauth2.authentication.mvc.handler.UsernamePasswordAuthenticationSuccessHandler;
+import cn.taroco.oauth2.authentication.mvc.provider.SmsCodeAuthenticationProvider;
+import cn.taroco.oauth2.authentication.config.redis.TarocoRedisRepository;
+import cn.taroco.oauth2.authentication.service.user.MobileUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;

@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.core;
+package cn.taroco.oauth2.authentication.entity;
 
 import lombok.Data;
 

@@ -1,5 +1,6 @@
-package cn.taroco.oauth2.authentication.token;
+package cn.taroco.oauth2.authentication.oauth2.token;
 
+import cn.taroco.oauth2.authentication.core.MyAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 

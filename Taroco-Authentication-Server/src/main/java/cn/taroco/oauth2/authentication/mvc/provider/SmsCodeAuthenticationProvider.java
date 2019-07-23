@@ -1,9 +1,10 @@
-package cn.taroco.oauth2.authentication.provider;
+package cn.taroco.oauth2.authentication.mvc.provider;
 
 import cn.hutool.core.util.StrUtil;
 import cn.taroco.oauth2.authentication.consts.CacheConstants;
-import cn.taroco.oauth2.authentication.redis.TarocoRedisRepository;
-import cn.taroco.oauth2.authentication.token.MobileTokenAuthenticationToken;
+import cn.taroco.oauth2.authentication.core.AbstractUserDetailsAuthenticationProvider;
+import cn.taroco.oauth2.authentication.config.redis.TarocoRedisRepository;
+import cn.taroco.oauth2.authentication.mvc.token.SmsCodeAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -15,14 +16,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
- * 定义手机号获取token校验逻辑
+ * 手机验证码登录系统 Provider
  *
  * @author liuht
- * 2019/5/13 15:25
+ * 2019/7/12 14:35
  * @see DaoAuthenticationProvider
  */
 @Slf4j
-public class MobileTokenAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+public class SmsCodeAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
     private UserDetailsService userDetailsService;
 
@@ -30,7 +31,7 @@ public class MobileTokenAuthenticationProvider extends AbstractUserDetailsAuthen
 
     @Override
     protected Authentication createSuccessAuthentication(final Object principal, final Authentication authentication, final UserDetails user) {
-        final MobileTokenAuthenticationToken token = new MobileTokenAuthenticationToken(principal, authentication.getCredentials(), user.getAuthorities());
+        final SmsCodeAuthenticationToken token = new SmsCodeAuthenticationToken(principal, authentication.getCredentials(), user.getAuthorities());
         token.setDetails(authentication.getDetails());
         return token;
     }
@@ -74,7 +75,7 @@ public class MobileTokenAuthenticationProvider extends AbstractUserDetailsAuthen
 
     @Override
     public boolean supports(final Class<?> authentication) {
-        return MobileTokenAuthenticationToken.class.isAssignableFrom(authentication);
+        return SmsCodeAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
     public UserDetailsService getUserDetailsService() {

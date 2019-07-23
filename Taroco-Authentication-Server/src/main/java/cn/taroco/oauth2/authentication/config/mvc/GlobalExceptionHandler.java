@@ -1,6 +1,6 @@
 package cn.taroco.oauth2.authentication.config.mvc;
 
-import cn.taroco.oauth2.authentication.core.Response;
+import cn.taroco.oauth2.authentication.mvc.response.Response;
 import cn.taroco.oauth2.authentication.exception.BusiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

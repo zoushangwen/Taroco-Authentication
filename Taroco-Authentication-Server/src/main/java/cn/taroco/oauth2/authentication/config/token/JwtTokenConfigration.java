@@ -1,7 +1,7 @@
 package cn.taroco.oauth2.authentication.config.token;
 
 import cn.taroco.oauth2.authentication.config.TarocoOauth2Properties;
-import cn.taroco.oauth2.authentication.token.CustomerAccessTokenConverter;
+import cn.taroco.oauth2.authentication.oauth2.token.CustomerAccessTokenConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.oauth2.provider.token.TokenStore;

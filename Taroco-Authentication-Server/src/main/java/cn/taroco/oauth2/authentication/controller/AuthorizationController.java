@@ -2,7 +2,7 @@ package cn.taroco.oauth2.authentication.controller;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.taroco.oauth2.authentication.core.Response;
+import cn.taroco.oauth2.authentication.mvc.response.Response;
 import cn.taroco.oauth2.authentication.entity.OauthClient;
 import cn.taroco.oauth2.authentication.service.client.OauthClientService;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.code;
+package cn.taroco.oauth2.authentication.oauth2.code;
 
 import cn.taroco.oauth2.authentication.consts.CacheConstants;
 import lombok.extern.slf4j.Slf4j;

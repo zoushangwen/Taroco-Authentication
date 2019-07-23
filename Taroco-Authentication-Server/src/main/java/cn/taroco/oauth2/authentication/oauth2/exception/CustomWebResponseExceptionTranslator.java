@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.exception;
+package cn.taroco.oauth2.authentication.oauth2.exception;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

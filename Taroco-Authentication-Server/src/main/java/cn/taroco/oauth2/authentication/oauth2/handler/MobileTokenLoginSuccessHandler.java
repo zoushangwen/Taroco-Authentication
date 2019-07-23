@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.handler;
+package cn.taroco.oauth2.authentication.oauth2.handler;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.map.MapUtil;

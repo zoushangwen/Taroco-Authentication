@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.redis;
+package cn.taroco.oauth2.authentication.config.redis;
 
 import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;

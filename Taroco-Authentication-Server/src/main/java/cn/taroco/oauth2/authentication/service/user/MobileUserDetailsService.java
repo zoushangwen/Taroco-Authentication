@@ -1,6 +1,7 @@
-package cn.taroco.oauth2.authentication.service;
+package cn.taroco.oauth2.authentication.service.user;
 
 import cn.taroco.oauth2.authentication.entity.User;
+import cn.taroco.oauth2.authentication.service.MockUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.stereotype.Service;

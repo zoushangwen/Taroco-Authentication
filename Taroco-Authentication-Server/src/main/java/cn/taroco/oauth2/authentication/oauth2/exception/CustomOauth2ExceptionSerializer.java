@@ -1,6 +1,6 @@
-package cn.taroco.oauth2.authentication.exception;
+package cn.taroco.oauth2.authentication.oauth2.exception;
 
-import cn.taroco.oauth2.authentication.core.Response;
+import cn.taroco.oauth2.authentication.mvc.response.Response;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;

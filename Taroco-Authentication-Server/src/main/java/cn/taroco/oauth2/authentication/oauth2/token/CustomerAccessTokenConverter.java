@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.token;
+package cn.taroco.oauth2.authentication.oauth2.token;
 
 import cn.taroco.oauth2.authentication.consts.SecurityConstants;
 import cn.taroco.oauth2.authentication.entity.User;

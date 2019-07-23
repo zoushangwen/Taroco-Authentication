@@ -1,11 +1,11 @@
 package cn.taroco.oauth2.authentication.config.extend;
 
-import cn.taroco.oauth2.authentication.filter.MobileTokenAuthenticationFilter;
-import cn.taroco.oauth2.authentication.handler.MobileTokenLoginFailureHandler;
-import cn.taroco.oauth2.authentication.handler.MobileTokenLoginSuccessHandler;
-import cn.taroco.oauth2.authentication.provider.MobileTokenAuthenticationProvider;
-import cn.taroco.oauth2.authentication.redis.TarocoRedisRepository;
-import cn.taroco.oauth2.authentication.service.MobileUserDetailsService;
+import cn.taroco.oauth2.authentication.oauth2.filter.MobileTokenAuthenticationFilter;
+import cn.taroco.oauth2.authentication.oauth2.handler.MobileTokenLoginFailureHandler;
+import cn.taroco.oauth2.authentication.oauth2.handler.MobileTokenLoginSuccessHandler;
+import cn.taroco.oauth2.authentication.oauth2.provider.MobileTokenAuthenticationProvider;
+import cn.taroco.oauth2.authentication.config.redis.TarocoRedisRepository;
+import cn.taroco.oauth2.authentication.service.user.MobileUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;

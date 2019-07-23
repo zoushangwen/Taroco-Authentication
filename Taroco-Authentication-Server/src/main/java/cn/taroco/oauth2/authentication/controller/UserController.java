@@ -2,8 +2,8 @@ package cn.taroco.oauth2.authentication.controller;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.taroco.oauth2.authentication.consts.CacheConstants;
-import cn.taroco.oauth2.authentication.core.Response;
-import cn.taroco.oauth2.authentication.redis.TarocoRedisRepository;
+import cn.taroco.oauth2.authentication.mvc.response.Response;
+import cn.taroco.oauth2.authentication.config.redis.TarocoRedisRepository;
 import cn.taroco.oauth2.authentication.service.MockUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

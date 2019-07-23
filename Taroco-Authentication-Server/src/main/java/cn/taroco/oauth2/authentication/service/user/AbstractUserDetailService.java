@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.service;
+package cn.taroco.oauth2.authentication.service.user;
 
 import cn.taroco.oauth2.authentication.entity.User;
 import lombok.extern.slf4j.Slf4j;

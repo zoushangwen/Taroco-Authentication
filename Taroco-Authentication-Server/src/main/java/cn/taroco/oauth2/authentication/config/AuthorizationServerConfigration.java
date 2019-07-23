@@ -1,12 +1,12 @@
 package cn.taroco.oauth2.authentication.config;
 
-import cn.taroco.oauth2.authentication.code.RedisAuthenticationCodeServices;
+import cn.taroco.oauth2.authentication.oauth2.code.RedisAuthenticationCodeServices;
 import cn.taroco.oauth2.authentication.consts.SecurityConstants;
 import cn.taroco.oauth2.authentication.entity.User;
-import cn.taroco.oauth2.authentication.exception.CustomWebResponseExceptionTranslator;
-import cn.taroco.oauth2.authentication.handler.CustomAccessDeniedHandler;
-import cn.taroco.oauth2.authentication.handler.CustomExceptionEntryPoint;
-import cn.taroco.oauth2.authentication.service.UserNameUserDetailsServiceImpl;
+import cn.taroco.oauth2.authentication.oauth2.exception.CustomWebResponseExceptionTranslator;
+import cn.taroco.oauth2.authentication.mvc.handler.CustomAccessDeniedHandler;
+import cn.taroco.oauth2.authentication.mvc.handler.CustomExceptionEntryPoint;
+import cn.taroco.oauth2.authentication.service.user.UserNameUserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
