@@ -66,7 +66,7 @@
         hasFeedback
       >
         <a-select
-          mode="multiple"
+          mode="tags"
           v-decorator="[
             'scope',
             {rules: [{ required: true, message: '请选择权限范围' }]}
