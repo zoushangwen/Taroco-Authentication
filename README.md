@@ -1235,5 +1235,7 @@ public class MockUserService {
 - [spring-security-oauth 开发者指南](http://projects.spring.io/spring-security-oauth/docs/oauth2.html)
 - [Spring Boot & Spring Session](https://docs.spring.io/spring-session/docs/current/reference/html5/guides/boot-redis.html)
 - [理解 OAuth 2.0（阮一峰）](http://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html)
+- [Spring Security 实现原理与源码解析](http://www.iocoder.cn/Spring-Security/good-collection/)
+- [OAuth2.0 最简向导](docs/OAuth2.0最简向导.pdf)
 - [vue.ant.design](https://vue.ant.design/docs/vue/introduce-cn/)
 - [Ant Design Pro of Vue](https://pro.loacg.com/docs/getting-started)
