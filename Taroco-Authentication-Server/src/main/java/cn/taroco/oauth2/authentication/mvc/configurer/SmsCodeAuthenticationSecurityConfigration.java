@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.config.extend;
+package cn.taroco.oauth2.authentication.mvc.configurer;
 
 import cn.taroco.oauth2.authentication.mvc.filter.SmsCodeAuthenticationFilter;
 import cn.taroco.oauth2.authentication.mvc.handler.UsernamePasswordAuthenticationFailureHandler;

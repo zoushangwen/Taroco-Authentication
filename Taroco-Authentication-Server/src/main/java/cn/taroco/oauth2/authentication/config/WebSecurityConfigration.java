@@ -1,7 +1,7 @@
 package cn.taroco.oauth2.authentication.config;
 
-import cn.taroco.oauth2.authentication.config.extend.MobileTokenAuthenticationSecurityConfigration;
-import cn.taroco.oauth2.authentication.config.extend.SmsCodeAuthenticationSecurityConfigration;
+import cn.taroco.oauth2.authentication.oauth2.configurer.MobileTokenAuthenticationSecurityConfigration;
+import cn.taroco.oauth2.authentication.mvc.configurer.SmsCodeAuthenticationSecurityConfigration;
 import cn.taroco.oauth2.authentication.mvc.filter.CustomUsernamePasswordAuthenticationFilter;
 import cn.taroco.oauth2.authentication.mvc.handler.CustomAccessDeniedHandler;
 import cn.taroco.oauth2.authentication.mvc.handler.CustomExceptionEntryPoint;

@@ -1,4 +1,4 @@
-package cn.taroco.oauth2.authentication.config.extend;
+package cn.taroco.oauth2.authentication.oauth2.configurer;
 
 import cn.taroco.oauth2.authentication.oauth2.filter.MobileTokenAuthenticationFilter;
 import cn.taroco.oauth2.authentication.oauth2.handler.MobileTokenLoginFailureHandler;
