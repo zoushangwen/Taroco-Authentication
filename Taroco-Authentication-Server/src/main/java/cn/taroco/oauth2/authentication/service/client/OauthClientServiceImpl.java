@@ -1,7 +1,8 @@
 package cn.taroco.oauth2.authentication.service.client;
 
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.taroco.oauth2.authentication.config.redis.TarocoRedisRepository;
+import cn.taroco.oauth2.authentication.consts.CacheConstants;
 import cn.taroco.oauth2.authentication.entity.OauthClient;
 import cn.taroco.oauth2.authentication.exception.BusiException;
 import cn.taroco.oauth2.authentication.mapper.OauthClientMapper;
@@ -9,6 +10,7 @@ import cn.taroco.oauth2.authentication.vo.OauthClientVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,10 +23,14 @@ import org.springframework.stereotype.Service;
  */
 @SuppressWarnings("unchecked")
 @Service
+@Slf4j
 public class OauthClientServiceImpl extends ServiceImpl<OauthClientMapper, OauthClient> implements OauthClientService {
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private TarocoRedisRepository redisRepository;
 
     @Override
     public OauthClientVo getVo(final String clientId) {
@@ -37,6 +43,13 @@ public class OauthClientServiceImpl extends ServiceImpl<OauthClientMapper, Oauth
         if (StrUtil.isEmpty(vo.getClientId())) {
             throw new BusiException("不存在客户端ID");
         }
+        final String key = CacheConstants.REDIS_CLIENTS_PREFIX + vo.getClientId();
+        if (redisRepository.exists(key)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Remove client:{} from redis.", key);
+            }
+            redisRepository.del(key);
+        }
         return this.updateById(new OauthClient(vo));
     }
 
@@ -46,7 +59,6 @@ public class OauthClientServiceImpl extends ServiceImpl<OauthClientMapper, Oauth
         if (StrUtil.isNotEmpty(vo.getClientId())) {
             throw new BusiException("存在客户端ID,无法新增");
         }
-        vo.setClientId(IdUtil.objectId());
         return this.save(new OauthClient(vo));
     }
 
@@ -54,6 +66,13 @@ public class OauthClientServiceImpl extends ServiceImpl<OauthClientMapper, Oauth
     public Boolean delete(final String clientId) {
         if (this.getById(clientId) == null) {
             throw new BusiException("不存在的客户端ID: " + clientId);
+        }
+        final String key = CacheConstants.REDIS_CLIENTS_PREFIX + clientId;
+        if (redisRepository.exists(key)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Remove client:{} from redis.", key);
+            }
+            redisRepository.del(key);
         }
         return this.removeById(clientId);
     }

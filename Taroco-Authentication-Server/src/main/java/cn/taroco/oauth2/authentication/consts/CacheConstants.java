@@ -29,6 +29,11 @@ public interface CacheConstants {
     String REDIS_TOKEN_PREFIX = PREFIX + "token" + SPLIT;
 
     /**
+     * Redis 客户端 缓存前缀
+     */
+    String REDIS_CLIENTS_PREFIX = PREFIX + "clients" + SPLIT;
+
+    /**
      * 验证码缓存key
      */
     String DEFAULT_CODE_KEY = PREFIX + "code" + SPLIT;

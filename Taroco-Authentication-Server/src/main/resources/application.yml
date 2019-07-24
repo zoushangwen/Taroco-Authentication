@@ -1,5 +1,8 @@
-server:
-  port: 8080
+spring:
+  application:
+    name: taroco-authentication-server
+  profiles:
+    active: dev
 
 management:
   endpoints:
@@ -13,46 +16,3 @@ management:
 logging:
   level:
     org.springframework.security: warn
-
-spring:
-  application:
-    name: taroco-authentication-server
-  datasource:
-    url: jdbc:mysql://localhost:3306/taroco-authentication?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true
-    username: taroco-authentication
-    password: taroco-authentication
-    driver-class-name: com.mysql.jdbc.Driver
-    hikari:
-      minimum-idle: 5
-      maximum-pool-size: 20
-      pool-name: Taroco-Authentication-HikariCP
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    password: hyman
-    database: 0
-  session:
-    store-type: redis
-
-taroco:
-  oauth2:
-    key-store:
-      location: classpath:taroco.jks
-      secret: taroco!@#$
-      alias: taroco
-    url-permit-all:
-      - /smsCode/*
-      - /actuator/**
-      - /login/mobile
-      - /oauth/mobile
-      - /oauth/exit
-      - /webjars/**
-      - /static/**
-      - /**/*.css
-      - /**/*.jpg
-      - /**/*.jpeg
-      - /**/*.png
-      - /**/*.svg
-      - /**/*.woff2
-      - /**/*.js
-      - /**/*.ico

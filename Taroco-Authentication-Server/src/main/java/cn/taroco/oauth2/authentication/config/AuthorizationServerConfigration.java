@@ -1,12 +1,16 @@
 package cn.taroco.oauth2.authentication.config;
 
-import cn.taroco.oauth2.authentication.oauth2.code.RedisAuthenticationCodeServices;
+import cn.taroco.oauth2.authentication.config.redis.TarocoRedisRepository;
+import cn.taroco.oauth2.authentication.consts.CacheConstants;
 import cn.taroco.oauth2.authentication.consts.SecurityConstants;
 import cn.taroco.oauth2.authentication.entity.User;
-import cn.taroco.oauth2.authentication.oauth2.exception.CustomWebResponseExceptionTranslator;
 import cn.taroco.oauth2.authentication.mvc.handler.CustomAccessDeniedHandler;
 import cn.taroco.oauth2.authentication.mvc.handler.CustomExceptionEntryPoint;
+import cn.taroco.oauth2.authentication.oauth2.code.RedisAuthenticationCodeServices;
+import cn.taroco.oauth2.authentication.oauth2.exception.CustomWebResponseExceptionTranslator;
+import cn.taroco.oauth2.authentication.oauth2.provider.CustomClientDetailsService;
 import cn.taroco.oauth2.authentication.service.user.UserNameUserDetailsServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +26,6 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
-import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
@@ -52,6 +55,9 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
     private TarocoOauth2Properties oauth2Properties;
 
     @Autowired
+    private TarocoRedisRepository redisRepository;
+
+    @Autowired
     private RedisConnectionFactory redisConnectionFactory;
 
     @Autowired
@@ -74,6 +80,9 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
 
     @Autowired(required = false)
     private JwtAccessTokenConverter jwtAccessTokenConverter;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -117,7 +126,7 @@ public class AuthorizationServerConfigration extends AuthorizationServerConfigur
     @Lazy
     @Scope(proxyMode = ScopedProxyMode.INTERFACES)
     public ClientDetailsService clientDetailsService() {
-        return new JdbcClientDetailsService(dataSource);
+        return new CustomClientDetailsService(CacheConstants.REDIS_CLIENTS_PREFIX, dataSource, redisRepository, objectMapper);
     }
 
     /**
